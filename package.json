@@ -8,7 +8,15 @@
     "start": "next start"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
+    "@types/pg": "^8.20.0",
+    "@use-gesture/react": "^10.3.1",
+    "@vercel/blob": "^2.3.3",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.8.0",
     "next": "16.2.4",
+    "openai": "^6.34.0",
+    "pg": "^8.20.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

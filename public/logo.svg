@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Diamond/shield shape -->
+  <polygon points="60,6 114,60 60,114 6,60" fill="#C41230" stroke="#0D0000" stroke-width="4"/>
+  <!-- SP text -->
+  <text x="60" y="52" font-family="Impact, Arial Black, sans-serif" font-size="22" font-weight="900" text-anchor="middle" fill="#F5F0F0" letter-spacing="-1">SP</text>
+  <!-- Decorative baseball stitches hint -->
+  <text x="60" y="76" font-family="Impact, Arial Black, sans-serif" font-size="13" font-weight="900" text-anchor="middle" fill="#F5F0F0" letter-spacing="1">SPYA</text>
+</svg>
