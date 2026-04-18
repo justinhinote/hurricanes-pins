@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
   const pool = getPool();
   const query = roundId
-    ? `SELECT p.*,
+    ? `SELECT p.*, cr.name AS creator_name,
               COUNT(CASE WHEN v.value = 'cash' THEN 1 END)::int AS cash_count,
               COUNT(CASE WHEN v.value = 'trash' THEN 1 END)::int AS trash_count,
               COUNT(v.id)::int AS total_votes,
@@ -21,10 +21,11 @@ export async function GET(req: NextRequest) {
               END AS score
        FROM pins p
        LEFT JOIN votes v ON v.pin_id = p.id
+       LEFT JOIN players cr ON cr.id = p.created_by
        WHERE p.round_id = $1
-       GROUP BY p.id
+       GROUP BY p.id, cr.name
        ORDER BY score DESC, total_votes DESC`
-    : `SELECT p.*,
+    : `SELECT p.*, cr.name AS creator_name,
               COUNT(CASE WHEN v.value = 'cash' THEN 1 END)::int AS cash_count,
               COUNT(CASE WHEN v.value = 'trash' THEN 1 END)::int AS trash_count,
               COUNT(v.id)::int AS total_votes,
@@ -33,9 +34,10 @@ export async function GET(req: NextRequest) {
               END AS score
        FROM pins p
        LEFT JOIN votes v ON v.pin_id = p.id
+       LEFT JOIN players cr ON cr.id = p.created_by
        JOIN rounds r ON r.id = p.round_id
        WHERE r.status = 'active'
-       GROUP BY p.id
+       GROUP BY p.id, cr.name
        ORDER BY score DESC, total_votes DESC`;
 
   const result = await pool.query<PinResult>(query, roundId ? [roundId] : []);

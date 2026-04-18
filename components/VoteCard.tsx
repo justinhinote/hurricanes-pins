@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
+import PlayerNav from '@/components/PlayerNav';
 
 interface Pin {
   id: number;
@@ -111,6 +112,7 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
 
   return (
     <div className="min-h-screen flex flex-col select-none" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
+      <PlayerNav />
       {/* Swipe hint overlay */}
       {showHint && (
         <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">

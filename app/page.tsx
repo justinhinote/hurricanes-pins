@@ -13,7 +13,7 @@ export default async function RootPage() {
       [playerToken]
     );
     if (result.rows.length > 0) {
-      redirect('/vote');
+      redirect('/design');
     }
   }
 

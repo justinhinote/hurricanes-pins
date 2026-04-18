@@ -89,6 +89,9 @@ export default function ResultsPage() {
                   <Image src={pin.image_url} alt="Pin" fill className="object-contain" sizes="64px" />
                 </div>
                 <div className="flex-1 min-w-0">
+                  {(pin as PinResult & { creator_name?: string }).creator_name && (
+                    <p className="text-fire text-xs font-bold mb-0.5">by {(pin as PinResult & { creator_name?: string }).creator_name}</p>
+                  )}
                   <p className="text-gray-400 text-xs leading-relaxed truncate">{pin.concept_text}</p>
                   <div className="flex items-center gap-3 mt-2">
                     {/* Vote bar */}
