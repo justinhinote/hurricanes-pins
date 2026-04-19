@@ -5,7 +5,7 @@ import { generateImage } from '@/lib/dalle';
 import { uploadImage } from '@/lib/upload-image';
 import Anthropic from '@anthropic-ai/sdk';
 
-const MAX_ATTEMPTS = 5;
+// No attempt limit — let the boys cook
 
 let _claude: Anthropic | null = null;
 function getClaude() {
@@ -41,19 +41,7 @@ export async function POST(req: NextRequest) {
   }
   const roundId = roundResult.rows[0].id;
 
-  // Check attempt count (edits are free, new generations cost 1)
-  const playerResult = await pool.query<{ name: string; design_attempts: number }>(
-    'SELECT name, design_attempts FROM players WHERE id = $1',
-    [playerId]
-  );
-  const player = playerResult.rows[0];
   const isEdit = !!edit_of;
-
-  if (!isEdit && player.design_attempts >= MAX_ATTEMPTS) {
-    return NextResponse.json({
-      error: `You've used all ${MAX_ATTEMPTS} design attempts.`
-    }, { status: 429 });
-  }
 
   // Build the concept description
   let conceptDescription = description?.trim() ?? '';
@@ -126,14 +114,6 @@ Create an image generation prompt. Specify: pin shape (vary it), enamel pin styl
   const filename = `pins/${roundId}/draft-${playerId}-${Date.now()}.png`;
   const { url, pathname } = await uploadImage(imageSource, filename);
 
-  // Increment attempt count (only for new generations, not edits)
-  if (!isEdit) {
-    await pool.query(
-      'UPDATE players SET design_attempts = design_attempts + 1 WHERE id = $1',
-      [playerId]
-    );
-  }
-
   // Return as DRAFT — not saved to DB yet. Client must call /api/design/submit
   return NextResponse.json({
     draft: {
@@ -144,6 +124,5 @@ Create an image generation prompt. Specify: pin shape (vary it), enamel pin styl
       tags,
       round_id: roundId,
     },
-    attempts_remaining: MAX_ATTEMPTS - (player.design_attempts + (isEdit ? 0 : 1)),
   });
 }

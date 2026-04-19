@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PlayerNav from '@/components/PlayerNav';
@@ -44,30 +44,41 @@ const REFINE_CHIPS = [
   'Make it metallic and shiny',
 ];
 
+// Auto-expanding textarea hook
+function useAutoResize(value: string) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.style.height = 'auto';
+      ref.current.style.height = `${Math.min(ref.current.scrollHeight, 200)}px`;
+    }
+  }, [value]);
+  return ref;
+}
+
 export default function DesignPage() {
   const [description, setDescription] = useState('');
   const [generating, setGenerating] = useState(false);
   const [draft, setDraft] = useState<DraftPin | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
   const [submittedPins, setSubmittedPins] = useState<SubmittedPin[]>([]);
   const [justSubmitted, setJustSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [photoData, setPhotoData] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useAutoResize(description);
+  const refineRef = useAutoResize(description);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch('/api/design/my-pins')
       .then(r => r.json())
       .then(data => {
-        if (typeof data.attempts_remaining === 'number') setAttemptsRemaining(data.attempts_remaining);
         if (data.pins) setSubmittedPins(data.pins);
       })
       .catch(() => {});
   }, []);
 
-  async function handleGenerate(isEdit = false) {
+  const handleGenerate = useCallback(async (isEdit = false) => {
     const prompt = description.trim();
     if (!prompt && !photoData) return;
     setGenerating(true);
@@ -92,10 +103,9 @@ export default function DesignPage() {
     }
 
     setDraft(data.draft);
-    setAttemptsRemaining(data.attempts_remaining);
     setPhotoData(null);
     setGenerating(false);
-  }
+  }, [description, photoData, draft]);
 
   async function handleSubmit() {
     if (!draft) return;
@@ -122,7 +132,7 @@ export default function DesignPage() {
 
   function handleRefine(chip: string) {
     setDescription(chip);
-    inputRef.current?.focus();
+    refineRef.current?.focus();
   }
 
   function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -131,7 +141,6 @@ export default function DesignPage() {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Strip the data:image/...;base64, prefix
       setPhotoData(result.split(',')[1]);
     };
     reader.readAsDataURL(file);
@@ -139,7 +148,7 @@ export default function DesignPage() {
 
   function handleStylePick(template: typeof STYLE_TEMPLATES[0]) {
     setDescription(template.prompt);
-    inputRef.current?.focus();
+    textareaRef.current?.focus();
   }
 
   function handleFormSubmit(e: React.FormEvent) {
@@ -147,7 +156,13 @@ export default function DesignPage() {
     handleGenerate(!!draft);
   }
 
-  const outOfAttempts = attemptsRemaining !== null && attemptsRemaining <= 0 && !draft;
+  // Handle Ctrl+Enter / Cmd+Enter to submit
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleGenerate(!!draft);
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col pb-16" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
@@ -163,13 +178,8 @@ export default function DesignPage() {
             </h1>
             <p className="text-gray-400 text-sm">Best designs get made into real trading pins</p>
           </div>
-          {attemptsRemaining !== null && (
-            <div className="flex items-center gap-1.5">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className={`w-2.5 h-2.5 rounded-full ${i < (5 - (attemptsRemaining ?? 0)) ? 'bg-crimson' : 'bg-gray-700'}`}/>
-              ))}
-              <span className="text-gray-400 text-sm ml-1">{attemptsRemaining}</span>
-            </div>
+          {submittedPins.length > 0 && (
+            <span className="text-fire text-sm font-bold">{submittedPins.length} submitted</span>
           )}
         </div>
       </div>
@@ -199,7 +209,7 @@ export default function DesignPage() {
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="flex-2 py-4 rounded-xl bg-green-600 text-white font-bold text-lg uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
+                className="py-4 rounded-xl bg-green-600 text-white font-bold text-lg uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
                 style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(34,197,94,0.3)', flex: 2 }}
               >
                 {submitting ? 'Submitting...' : 'Submit to Contest'}
@@ -208,8 +218,8 @@ export default function DesignPage() {
 
             {/* Refine section */}
             <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-4 max-w-sm mx-auto">
-              <p className="text-fire text-sm font-bold uppercase tracking-wide mb-2">Refine This Design (free)</p>
-              <p className="text-gray-400 text-sm mb-3">Describe what to change — doesn&apos;t use an attempt</p>
+              <p className="text-fire text-sm font-bold uppercase tracking-wide mb-1">Refine This Design</p>
+              <p className="text-gray-400 text-sm mb-3">Describe what to change</p>
 
               <div className="flex flex-wrap gap-2 mb-3">
                 {REFINE_CHIPS.slice(0, 6).map(chip => (
@@ -223,15 +233,16 @@ export default function DesignPage() {
                 ))}
               </div>
 
-              <form onSubmit={handleFormSubmit} className="flex gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
+              <form onSubmit={handleFormSubmit} className="flex gap-2 items-end">
+                <textarea
+                  ref={refineRef}
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  placeholder="Change the colors, add text, etc..."
+                  onKeyDown={handleKeyDown}
+                  placeholder="Change the colors, add text, make it bigger..."
                   disabled={generating}
-                  className="flex-1 bg-black/40 border border-gray-700 text-sp-white text-base px-4 py-3 rounded-full focus:outline-none focus:border-crimson placeholder-gray-500 disabled:opacity-50"
+                  rows={1}
+                  className="flex-1 bg-black/40 border border-gray-700 text-sp-white text-base px-4 py-3 rounded-2xl focus:outline-none focus:border-crimson placeholder-gray-500 disabled:opacity-50 resize-none overflow-hidden"
                 />
                 <button
                   type="submit"
@@ -254,15 +265,13 @@ export default function DesignPage() {
           <div className="bg-green-600/10 border border-green-600/40 rounded-xl p-5 text-center animate-fade-in mb-5">
             <p className="text-green-500 text-lg font-bold">Pin submitted to the contest!</p>
             <p className="text-gray-400 text-base mt-1">Now get your teammates to vote on it.</p>
-            <div className="flex gap-3 justify-center mt-4">
+            <div className="flex gap-4 justify-center mt-4">
               <Link href="/vote" className="text-base text-crimson font-bold hover:text-fire transition-colors">
                 Go vote
               </Link>
-              {attemptsRemaining && attemptsRemaining > 0 && (
-                <button onClick={() => setJustSubmitted(false)} className="text-base text-gray-400 font-bold hover:text-sp-white transition-colors">
-                  Design another
-                </button>
-              )}
+              <button onClick={() => setJustSubmitted(false)} className="text-base text-gray-400 font-bold hover:text-sp-white transition-colors">
+                Design another
+              </button>
             </div>
           </div>
         )}
@@ -282,12 +291,12 @@ export default function DesignPage() {
         )}
 
         {/* === DESIGN INPUT (no draft, not generating) === */}
-        {!draft && !generating && !justSubmitted && !outOfAttempts && (
+        {!draft && !generating && !justSubmitted && (
           <div>
             {/* Submitted pins gallery */}
             {submittedPins.length > 0 && (
               <div className="mb-5">
-                <p className="text-fire text-sm font-bold uppercase tracking-wide mb-2">Your Submissions</p>
+                <p className="text-fire text-sm font-bold uppercase tracking-wide mb-2">Your Submissions ({submittedPins.length})</p>
                 <div className="flex gap-3 overflow-x-auto pb-2">
                   {submittedPins.map(pin => (
                     <div key={pin.id} className="shrink-0 w-24">
@@ -301,7 +310,7 @@ export default function DesignPage() {
               </div>
             )}
 
-            {/* Intro + style picker */}
+            {/* Intro */}
             <div className="bg-charcoal/60 border border-gray-800 rounded-2xl p-4 mb-4">
               <p className="text-sp-white text-base font-bold mb-1">Describe your dream pin</p>
               <p className="text-gray-400 text-sm leading-relaxed">Pick a style below, type your own idea, or upload a sketch. Spinners, oversized shapes, glow effects — the crazier the better.</p>
@@ -324,7 +333,7 @@ export default function DesignPage() {
               ))}
             </div>
 
-            {/* Photo upload */}
+            {/* Photo upload preview */}
             {photoData && (
               <div className="flex items-center gap-3 mb-3 bg-charcoal/60 border border-gray-800 rounded-xl p-3">
                 <div className="w-14 h-14 bg-black/40 rounded-lg overflow-hidden relative shrink-0">
@@ -338,8 +347,8 @@ export default function DesignPage() {
               </div>
             )}
 
-            {/* Input area */}
-            <form onSubmit={handleFormSubmit} className="flex gap-2 mb-2">
+            {/* Input area — auto-expanding textarea */}
+            <form onSubmit={handleFormSubmit} className="flex gap-2 items-end mb-2">
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
@@ -358,13 +367,14 @@ export default function DesignPage() {
                 className="hidden"
                 onChange={handlePhotoSelect}
               />
-              <input
-                ref={inputRef}
-                type="text"
+              <textarea
+                ref={textareaRef}
                 value={description}
                 onChange={e => setDescription(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Describe your pin idea..."
-                className="flex-1 bg-charcoal border border-gray-700 text-sp-white text-base px-4 py-3 rounded-full focus:outline-none focus:border-crimson placeholder-gray-500"
+                rows={1}
+                className="flex-1 bg-charcoal border border-gray-700 text-sp-white text-base px-4 py-3 rounded-2xl focus:outline-none focus:border-crimson placeholder-gray-500 resize-none overflow-hidden"
               />
               <button
                 type="submit"
@@ -378,17 +388,6 @@ export default function DesignPage() {
             </form>
 
             {error && <p className="text-fire text-sm mt-1">{error}</p>}
-          </div>
-        )}
-
-        {/* === OUT OF ATTEMPTS === */}
-        {outOfAttempts && !justSubmitted && (
-          <div className="text-center py-10">
-            <p className="text-gray-400 text-lg mb-2">You&apos;ve used all your design attempts.</p>
-            <p className="text-gray-500 text-base mb-4">Your {submittedPins.length} pin{submittedPins.length !== 1 ? 's are' : ' is'} in the contest!</p>
-            <Link href="/vote" className="inline-block bg-crimson text-sp-white font-bold px-8 py-4 rounded-xl text-lg uppercase tracking-widest active:scale-95 transition-all">
-              Vote Now
-            </Link>
           </div>
         )}
       </div>
