@@ -129,9 +129,10 @@ async function main() {
 
         // 3. Upload to Vercel Blob at the same blob_key (overwrite)
         const blobKey = pin.blob_key;
-        const blob = await put(blobKey, composited, {
+        // Upload with new unique path to avoid overwrite issues
+        const newBlobKey = blobKey.replace('.png', `-v2-${Date.now()}.png`);
+        const blob = await put(newBlobKey, composited, {
           access: 'public',
-          addRandomSuffix: false,
           contentType: 'image/png',
         });
 
