@@ -32,13 +32,28 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
   const reasonsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startX = useRef(0);
   const cardRef = useRef<HTMLDivElement>(null);
+  // Track every pin we've shown the user this session so the server can never
+  // re-surface one (defends against the race between fire-and-forget vote POST
+  // and the next prefetch).
+  const seenIds = useRef<Set<number>>(new Set(initialPin ? [initialPin.id] : []));
+
+  function buildExcludeQuery(extra?: number | null): string {
+    const ids = new Set(seenIds.current);
+    if (extra != null) ids.add(extra);
+    if (ids.size === 0) return '';
+    return `?exclude=${[...ids].join(',')}`;
+  }
 
   async function prefetchNext() {
-    const res = await fetch('/api/vote/next');
+    const res = await fetch(`/api/vote/next${buildExcludeQuery()}`);
     if (res.ok) {
       const data = await res.json();
-      if (data.done) setNextPin(null);
-      else setNextPin(data.pin);
+      if (data.done || !data.pin) {
+        setNextPin(null);
+      } else {
+        seenIds.current.add(data.pin.id);
+        setNextPin(data.pin);
+      }
     }
   }
 
@@ -54,10 +69,11 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
       setCurrentPin(nextPin);
       setNextPin(null);
     } else {
-      const res = await fetch('/api/vote/next');
+      const res = await fetch(`/api/vote/next${buildExcludeQuery()}`);
       if (res.ok) {
         const data = await res.json();
         if (data.pin) {
+          seenIds.current.add(data.pin.id);
           setCurrentPin(data.pin);
         } else {
           setCurrentPin(null);

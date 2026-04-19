@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getPool } from '@/lib/db';
 import { cookies } from 'next/headers';
+import { displayConcept } from '@/lib/concept-display';
 
 export const dynamic = 'force-dynamic';
 
@@ -179,7 +180,7 @@ export default async function HomePage() {
                     <Image src={pin.image_url} alt={`#${i + 1}`} fill className="object-contain" sizes="56px" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sp-white text-base truncate">{pin.concept_text}</p>
+                    <p className="text-sp-white text-base truncate">{displayConcept(pin.concept_text, 90)}</p>
                     {pin.creator_name && <p className="text-gray-400 text-sm mt-0.5 break-words">by {pin.creator_name}</p>}
                   </div>
                 </div>

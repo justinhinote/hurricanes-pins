@@ -46,10 +46,13 @@ export async function POST(req: NextRequest) {
 
   const isEdit = !!edit_of;
 
-  // Build the concept description
-  let conceptDescription = description?.trim() ?? '';
+  // The user's typed description is what gets shown publicly as the pin's
+  // concept text. The vision dump (if a photo was uploaded) is internal-only
+  // — it feeds the image-prompt step but is never persisted or displayed.
+  const userDescription = description?.trim() ?? '';
+  let promptInput = userDescription;
+  let displayConcept = userDescription;
 
-  // If a photo was uploaded, use Claude vision to describe it
   if (photo) {
     const visionRes = await getClaude().messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -63,17 +66,18 @@ export async function POST(req: NextRequest) {
           },
           {
             type: 'text',
-            text: `This is a sketch or reference image for a baseball trading pin design for the South Park Hurricanes (SPYA) team going to Cooperstown 2026. Describe the key visual elements, shapes, and themes in this image in 2-3 sentences so they can be used to generate a polished trading pin design.${conceptDescription ? ` The user also said: "${conceptDescription}"` : ''}`,
+            text: `This is a sketch or reference image for a baseball trading pin design for the South Park Hurricanes (SPYA) team going to Cooperstown 2026. Describe the key visual elements, shapes, and themes in this image in 2-3 sentences so they can be used to generate a polished trading pin design.${userDescription ? ` The user also said: "${userDescription}"` : ''}`,
           },
         ],
       }],
     });
     const visionText = visionRes.content[0].type === 'text' ? visionRes.content[0].text : '';
-    conceptDescription = visionText + (conceptDescription ? `. User notes: ${conceptDescription}` : '');
+    promptInput = visionText + (userDescription ? `. User notes: ${userDescription}` : '');
+    if (!displayConcept) displayConcept = 'Designed from a photo';
   }
 
   // Claude turns the description into an image generation prompt
-  const editContext = isEdit ? `\nThis is a REVISION of a previous design. The user wants to modify it: "${conceptDescription}". Keep the same general concept but apply the requested changes.` : '';
+  const editContext = isEdit ? `\nThis is a REVISION of a previous design. The user wants to modify it: "${promptInput}". Keep the same general concept but apply the requested changes.` : '';
 
   const claudeRes = await getClaude().messages.create({
     model: 'claude-haiku-4-5-20251001',
@@ -99,7 +103,7 @@ IMAGE RULES:
 Return ONLY a JSON object: {"image_prompt": "...", "tags": ["...", "..."]}. No markdown.`,
     messages: [{
       role: 'user',
-      content: `Pin idea: "${conceptDescription}"${editContext}
+      content: `Pin idea: "${promptInput}"${editContext}
 
 Create an image generation prompt. Specify: pin shape (vary it), enamel pin style, team colors, the visual idea, and any text EXACTLY as it should appear. White/clean background.`
     }]
@@ -113,7 +117,7 @@ Create an image generation prompt. Specify: pin shape (vary it), enamel pin styl
     imagePrompt = parsed.image_prompt;
     tags = parsed.tags ?? [];
   } catch {
-    imagePrompt = `Trading pin design, enamel pin, shield shape, South Park Hurricanes, crimson red and black, ${conceptDescription}, professional sports trading pin, single pin centered on white background, no text`;
+    imagePrompt = `Trading pin design, enamel pin, shield shape, South Park Hurricanes, crimson red and black, ${promptInput}, professional sports trading pin, single pin centered on white background, no text`;
     tags = ['hurricanes', 'baseball', 'cooperstown', 'crimson', 'enamel'];
   }
 
@@ -129,7 +133,7 @@ Create an image generation prompt. Specify: pin shape (vary it), enamel pin styl
     draft: {
       image_url: url,
       blob_key: pathname,
-      concept_text: conceptDescription,
+      concept_text: displayConcept,
       prompt_used: imagePrompt,
       tags,
       round_id: roundId,

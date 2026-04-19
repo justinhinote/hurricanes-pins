@@ -192,7 +192,7 @@ export default function DesignPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pb-16" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
+    <div className="min-h-screen flex flex-col pb-24" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
       <PlayerNav />
 
       {/* Header */}
@@ -470,7 +470,7 @@ export default function DesignPage() {
             {/* Tips */}
             <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-4">
               <p className="text-gray-400 text-sm leading-relaxed">
-                <span className="text-sp-white font-bold">Tips:</span> These are team pins — we order 100+ of the winners. Bold shapes trade best. One special feature (spinner, dangler, glitter, glow) beats five stacked together. Whatever you typed in the text fields above gets added after the AI finishes drawing.
+                <span className="text-sp-white font-bold">Tip:</span> Bold shape, one wow feature (spinner, dangler, glitter, or glow). Pick one — five stacked together looks busy.
               </p>
             </div>
           </div>
