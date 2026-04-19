@@ -1,8 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
-  <!-- Diamond/shield shape -->
-  <polygon points="60,6 114,60 60,114 6,60" fill="#C41230" stroke="#0D0000" stroke-width="4"/>
-  <!-- SP text -->
-  <text x="60" y="52" font-family="Impact, Arial Black, sans-serif" font-size="22" font-weight="900" text-anchor="middle" fill="#F5F0F0" letter-spacing="-1">SP</text>
-  <!-- Decorative baseball stitches hint -->
-  <text x="60" y="76" font-family="Impact, Arial Black, sans-serif" font-size="13" font-weight="900" text-anchor="middle" fill="#F5F0F0" letter-spacing="1">SPYA</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" fill="none">
+  <defs>
+    <!-- Beveled edge gradient for 3D effect -->
+    <linearGradient id="shieldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9B1025"/>
+      <stop offset="40%" stop-color="#C41230"/>
+      <stop offset="100%" stop-color="#7A0C1E"/>
+    </linearGradient>
+    <linearGradient id="borderGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4A4A4A"/>
+      <stop offset="50%" stop-color="#2A2A2A"/>
+      <stop offset="100%" stop-color="#1A1A1A"/>
+    </linearGradient>
+    <linearGradient id="innerBorder" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5A5A5A"/>
+      <stop offset="100%" stop-color="#333333"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer black border (beveled) -->
+  <path d="M100,4 L188,80 L100,216 L12,80 Z" fill="url(#borderGrad)" stroke="#111" stroke-width="3"/>
+
+  <!-- Inner dark border -->
+  <path d="M100,14 L180,82 L100,206 L20,82 Z" fill="url(#innerBorder)" stroke="#333" stroke-width="1.5"/>
+
+  <!-- Main crimson shield -->
+  <path d="M100,24 L172,84 L100,196 L28,84 Z" fill="url(#shieldGrad)"/>
+
+  <!-- Inner border line detail -->
+  <path d="M100,34 L164,86 L100,186 L36,86 Z" fill="none" stroke="#7A0C1E" stroke-width="2"/>
+
+  <!-- S letter -->
+  <text x="100" y="100" font-family="Impact, 'Arial Black', sans-serif" font-size="62" font-weight="900" text-anchor="middle" fill="#1A0A0A" stroke="#1A0A0A" stroke-width="5" paint-order="stroke">S</text>
+  <text x="100" y="100" font-family="Impact, 'Arial Black', sans-serif" font-size="62" font-weight="900" text-anchor="middle" fill="#8B0D22">S</text>
+
+  <!-- P letter -->
+  <text x="100" y="152" font-family="Impact, 'Arial Black', sans-serif" font-size="62" font-weight="900" text-anchor="middle" fill="#1A0A0A" stroke="#1A0A0A" stroke-width="5" paint-order="stroke">P</text>
+  <text x="100" y="152" font-family="Impact, 'Arial Black', sans-serif" font-size="62" font-weight="900" text-anchor="middle" fill="#8B0D22">P</text>
 </svg>

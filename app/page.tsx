@@ -19,7 +19,6 @@ export default async function HomePage() {
 
   const pool = getPool();
 
-  // Get top ranked pins
   let rankedPins: RankedPin[] = [];
   let stats = { total_pins: 0, total_votes: 0, total_players: 0 };
 
@@ -54,149 +53,196 @@ export default async function HomePage() {
       total_players: parseInt(statsResult.rows[0]?.total_players ?? '0'),
     };
   } catch {
-    // DB not ready yet — show page without rankings
+    // DB not ready — show page without rankings
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
+    <div className="min-h-screen bg-black">
 
-      {/* Hero */}
-      <div className="px-6 pt-10 pb-6 text-center">
-        <div className="flex flex-col items-center gap-3 mb-5">
-          <Image src="/logo.svg" alt="SP Hurricanes" width={80} height={80} priority />
-          <h1 className="text-4xl sm:text-5xl text-sp-white leading-none tracking-tight" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '2px 2px 0 #C41230, 4px 4px 8px rgba(0,0,0,0.8)' }}>
-            SOUTH PARK
+      {/* ===== HERO SECTION with team photo ===== */}
+      <div className="relative overflow-hidden" style={{ minHeight: '420px' }}>
+        {/* Team photo background with slow zoom */}
+        <div className="absolute inset-0">
+          <Image
+            src="/team-photo.png"
+            alt="South Park Hurricanes 12U"
+            fill
+            className="object-cover object-top animate-slow-zoom"
+            priority
+            sizes="100vw"
+          />
+        </div>
+
+        {/* Dark vignette overlay */}
+        <div
+          className="absolute inset-0 hero-vignette"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(13,0,0,0.3) 0%, rgba(13,0,0,0.1) 30%, rgba(13,0,0,0.5) 70%, rgba(13,0,0,1) 100%), radial-gradient(ellipse at center, transparent 30%, rgba(13,0,0,0.7) 100%)',
+          }}
+        />
+
+        {/* Lightning bolts */}
+        <svg className="absolute top-0 left-4 w-20 h-40 animate-lightning-strike pointer-events-none" viewBox="0 0 40 80" fill="none">
+          <polyline points="28,0 14,32 22,32 8,80" stroke="#FF5500" strokeWidth="2.5" strokeLinejoin="round" opacity="0.8"/>
+        </svg>
+        <svg className="absolute top-0 right-4 w-20 h-40 animate-lightning-strike-2 pointer-events-none" viewBox="0 0 40 80" fill="none">
+          <polyline points="12,0 26,32 18,32 32,80" stroke="#FF5500" strokeWidth="2.5" strokeLinejoin="round" opacity="0.8"/>
+        </svg>
+
+        {/* Hero content */}
+        <div className="relative z-10 flex flex-col items-center justify-end px-6 pb-8 pt-48 sm:pt-56">
+          {/* SP Logo */}
+          <div className="animate-logo-glow mb-4">
+            <Image src="/logo.svg" alt="SP Hurricanes" width={90} height={100} priority />
+          </div>
+
+          {/* Title */}
+          <h1 className="text-4xl sm:text-5xl text-sp-white leading-none tracking-tight text-center animate-float-up" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '3px 3px 0 #0D0000, 0 0 30px rgba(196,18,48,0.5)' }}>
+            SOUTH PARK HURRICANES
           </h1>
-          <h1 className="text-4xl sm:text-5xl text-crimson leading-none tracking-tight" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '2px 2px 0 #8B0D22' }}>
-            HURRICANES
-          </h1>
-          <p className="text-fire text-sm font-bold tracking-widest uppercase mt-1">
-            Cooperstown 2026 Pin Design Contest
+
+          {/* Subtitle */}
+          <p className="text-fire text-sm sm:text-base font-bold tracking-widest uppercase mt-3 animate-float-up-delay-1 text-center" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
+            Cooperstown 2026 &mdash; Pin Design Contest
           </p>
+
+          {/* CTA buttons */}
+          <div className="flex gap-3 mt-6 w-full max-w-xs animate-float-up-delay-2">
+            <Link
+              href={hasSession ? '/design' : '/join'}
+              className="flex-1 flex items-center justify-center gap-2 bg-crimson text-sp-white font-bold py-4 rounded-xl active:scale-95 transition-all text-center"
+              style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 24px rgba(196,18,48,0.5)' }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/>
+              </svg>
+              DESIGN
+            </Link>
+            <Link
+              href={hasSession ? '/vote' : '/join'}
+              className="flex-1 flex items-center justify-center gap-2 bg-black/60 border-2 border-sp-white/20 text-sp-white font-bold py-4 rounded-xl active:scale-95 transition-all backdrop-blur-sm text-center hover:border-crimson/50"
+              style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              VOTE
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* What is this */}
-      <div className="px-6 max-w-lg mx-auto mb-8">
-        <div className="bg-charcoal/70 border border-gray-800 rounded-2xl p-5">
-          <h2 className="text-sp-white font-bold text-lg mb-3" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
-            HOW IT WORKS
-          </h2>
-          <div className="flex flex-col gap-3 text-gray-400 text-sm leading-relaxed">
-            <div className="flex gap-3">
-              <span className="shrink-0 w-7 h-7 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-xs font-bold">1</span>
-              <p><span className="text-sp-white font-bold">Design</span> — Describe your dream pin and AI creates it. Shields, spinners, unusual shapes — anything goes. The wildest pins get traded most at Cooperstown.</p>
+      {/* ===== HOW IT WORKS ===== */}
+      <div className="px-6 max-w-lg mx-auto py-10" style={{ background: 'linear-gradient(to bottom, #0D0000 0%, #0D0000 100%)' }}>
+        <h2 className="text-sp-white font-bold text-xl mb-5 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+          HOW IT WORKS
+        </h2>
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4 items-start">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">1</span>
+            <div>
+              <p className="text-sp-white font-bold text-sm">Design Your Pin</p>
+              <p className="text-gray-500 text-sm leading-relaxed mt-0.5">Describe your dream pin and AI creates it. Spinners, oversized shapes, dangling charms, light-up styles — the wildest pins get traded most at Cooperstown.</p>
             </div>
-            <div className="flex gap-3">
-              <span className="shrink-0 w-7 h-7 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-xs font-bold">2</span>
-              <p><span className="text-sp-white font-bold">Vote</span> — Swipe through everyone&apos;s designs. Swipe right or tap CASH for pins you love. Swipe left or tap TRASH to pass. Your votes are blind — nobody sees the scores.</p>
+          </div>
+          <div className="flex gap-4 items-start">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">2</span>
+            <div>
+              <p className="text-sp-white font-bold text-sm">Cash or Trash</p>
+              <p className="text-gray-500 text-sm leading-relaxed mt-0.5">Swipe through everyone&apos;s designs. CASH the pins you&apos;d want to trade. TRASH the ones you wouldn&apos;t. Blind voting — nobody sees the scores.</p>
             </div>
-            <div className="flex gap-3">
-              <span className="shrink-0 w-7 h-7 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-xs font-bold">3</span>
-              <p><span className="text-sp-white font-bold">Win</span> — Top-voted designs get manufactured as real trading pins for the team. The best pins become your Cooperstown collection.</p>
+          </div>
+          <div className="flex gap-4 items-start">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">3</span>
+            <div>
+              <p className="text-sp-white font-bold text-sm">Winners Get Made</p>
+              <p className="text-gray-500 text-sm leading-relaxed mt-0.5">Top-voted designs get manufactured as real trading pins. The best become your Cooperstown collection — a series of 3 collectibles plus a special mid-week drop.</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* CTAs */}
-      <div className="px-6 max-w-lg mx-auto mb-10 flex gap-3">
-        <Link
-          href={hasSession ? '/design' : '/join'}
-          className="flex-1 flex flex-col items-center justify-center gap-2 bg-crimson text-sp-white font-bold py-5 rounded-xl active:scale-95 transition-all"
-          style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(196,18,48,0.4)' }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
-          </svg>
-          <span className="text-lg uppercase tracking-widest">Design</span>
-        </Link>
-        <Link
-          href={hasSession ? '/vote' : '/join'}
-          className="flex-1 flex flex-col items-center justify-center gap-2 bg-charcoal border-2 border-gray-700 text-sp-white font-bold py-5 rounded-xl active:scale-95 transition-all hover:border-crimson/50"
-          style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-          <span className="text-lg uppercase tracking-widest">Vote</span>
-        </Link>
-      </div>
-
-      {/* Live stats */}
+      {/* ===== LIVE STATS ===== */}
       {(stats.total_pins > 0 || stats.total_votes > 0) && (
-        <div className="px-6 max-w-lg mx-auto mb-8">
-          <div className="flex justify-center gap-8">
-            <div className="text-center">
-              <p className="text-2xl text-sp-white font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_pins}</p>
-              <p className="text-gray-600 text-xs uppercase tracking-wider">Designs</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl text-sp-white font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_votes}</p>
-              <p className="text-gray-600 text-xs uppercase tracking-wider">Votes Cast</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl text-sp-white font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_players}</p>
-              <p className="text-gray-600 text-xs uppercase tracking-wider">Voters</p>
+        <div className="px-6 max-w-lg mx-auto pb-10">
+          <div className="bg-charcoal/70 border border-gray-800 rounded-2xl p-5">
+            <div className="flex justify-around">
+              <div className="text-center">
+                <p className="text-3xl text-sp-white font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_pins}</p>
+                <p className="text-gray-600 text-xs uppercase tracking-wider mt-1">Designs</p>
+              </div>
+              <div className="w-px bg-gray-800"/>
+              <div className="text-center">
+                <p className="text-3xl text-fire font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_votes}</p>
+                <p className="text-gray-600 text-xs uppercase tracking-wider mt-1">Votes</p>
+              </div>
+              <div className="w-px bg-gray-800"/>
+              <div className="text-center">
+                <p className="text-3xl text-sp-white font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_players}</p>
+                <p className="text-gray-600 text-xs uppercase tracking-wider mt-1">Voters</p>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Rankings */}
+      {/* ===== TOP DESIGNS RANKINGS ===== */}
       {rankedPins.length > 0 && (
-        <div className="px-6 max-w-lg mx-auto pb-16">
+        <div className="px-6 max-w-lg mx-auto pb-10">
           <h2 className="text-sp-white font-bold text-xl mb-1 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
             TOP DESIGNS
           </h2>
           <p className="text-gray-600 text-xs text-center mb-5 uppercase tracking-wider">
-            Ranked by popular vote &mdash; updated live
+            Ranked by popular vote
           </p>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2.5">
             {rankedPins.map((pin, i) => {
               const isTop3 = i < 3;
-              const rankColors = ['text-yellow-400 border-yellow-400/40 bg-yellow-400/10', 'text-gray-300 border-gray-400/40 bg-gray-400/10', 'text-orange-400 border-orange-400/40 bg-orange-400/10'];
+              const rankColors = [
+                'text-yellow-400 border-yellow-500/50 bg-yellow-500/10',
+                'text-gray-300 border-gray-400/50 bg-gray-400/10',
+                'text-orange-400 border-orange-500/50 bg-orange-500/10',
+              ];
+              const ringColors = ['ring-yellow-500/30', 'ring-gray-400/30', 'ring-orange-500/30'];
               return (
                 <div
                   key={pin.id}
-                  className={`flex items-center gap-4 rounded-xl p-3 transition-colors ${isTop3 ? 'bg-charcoal border border-gray-800' : 'bg-charcoal/50'}`}
+                  className={`flex items-center gap-3 rounded-xl p-3 ${isTop3 ? 'bg-charcoal border border-gray-800' : 'bg-charcoal/40'}`}
                 >
-                  {/* Rank number */}
-                  <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border ${isTop3 ? rankColors[i] : 'text-gray-600 border-gray-800 bg-black/30'}`}>
+                  <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border ${isTop3 ? rankColors[i] : 'text-gray-600 border-gray-800 bg-black/30'}`}>
                     {i + 1}
                   </div>
-
-                  {/* Pin image */}
-                  <div className={`shrink-0 w-14 h-14 relative rounded-lg overflow-hidden ${isTop3 ? 'ring-2 ring-crimson/30' : ''}`}>
-                    <Image src={pin.image_url} alt={`Rank ${i + 1}`} fill className="object-contain" sizes="56px" />
+                  <div className={`shrink-0 w-14 h-14 relative rounded-lg overflow-hidden bg-black/40 ${isTop3 ? `ring-2 ${ringColors[i]}` : ''}`}>
+                    <Image src={pin.image_url} alt={`#${i + 1}`} fill className="object-contain" sizes="56px" />
                   </div>
-
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sp-white text-sm truncate">{pin.concept_text}</p>
                     {pin.creator_name && (
                       <p className="text-gray-600 text-xs mt-0.5">by {pin.creator_name}</p>
                     )}
                   </div>
-
-                  {/* Votes indicator (bar, not number) */}
-                  {pin.total_votes > 0 && (
-                    <div className="shrink-0 w-12">
-                      <div className="h-1.5 bg-black/60 rounded-full overflow-hidden">
-                        <div className="h-full bg-crimson rounded-full" style={{ width: `${Math.max(20, 100 - i * 10)}%` }}/>
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })}
           </div>
+
+          {/* CTA below rankings */}
+          <div className="mt-6 text-center">
+            <Link
+              href={hasSession ? '/vote' : '/join'}
+              className="inline-block bg-crimson text-sp-white font-bold px-8 py-3 rounded-xl uppercase tracking-widest text-sm active:scale-95 transition-all"
+              style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(196,18,48,0.4)' }}
+            >
+              Vote Now &mdash; Change the Rankings
+            </Link>
+          </div>
         </div>
       )}
 
-      {/* Footer */}
-      <div className="px-6 pb-10 text-center">
+      {/* ===== FOOTER ===== */}
+      <div className="px-6 py-8 text-center border-t border-gray-900">
+        <Image src="/logo.svg" alt="SP" width={36} height={40} className="mx-auto mb-3 opacity-40" />
         <p className="text-gray-700 text-xs">
           South Park Hurricanes &bull; SPYA Baseball &bull; Cooperstown 2026
         </p>
