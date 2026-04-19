@@ -1,24 +1,17 @@
 import sharp from 'sharp';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 import { sanitizePinText, hasAnyText, type PinText } from './pin-text';
+import { ANTON_BASE64 } from './font-data';
 
 function escapeXml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
-// Cache the base64-encoded font once per cold start. We embed the font into
-// the SVG itself so librsvg doesn't depend on the host's installed fonts —
-// Vercel's Linux runtime has no Impact / Helvetica / etc., which silently
-// renders all glyphs as .notdef boxes.
-let fontDataUrlPromise: Promise<string> | null = null;
-function getFontDataUrl(): Promise<string> {
-  if (!fontDataUrlPromise) {
-    fontDataUrlPromise = readFile(join(process.cwd(), 'public/fonts/Anton-Regular.ttf'))
-      .then(buf => `data:font/ttf;base64,${buf.toString('base64')}`);
-  }
-  return fontDataUrlPromise;
-}
+// Embed the font directly into the SVG as a data: URL. librsvg on Vercel's
+// Linux runtime has no Impact / Helvetica / etc., which silently renders all
+// glyphs as .notdef boxes. Inlining the bytes (vs reading from disk) means
+// the font is guaranteed to be in the function bundle — no reliance on
+// outputFileTracingIncludes correctly catching the runtime read.
+const FONT_DATA_URL = `data:font/ttf;base64,${ANTON_BASE64}`;
 
 export async function addTextOverlay(imageSource: string, text?: PinText): Promise<Buffer> {
   let imageBuffer: Buffer;
@@ -40,8 +33,6 @@ export async function addTextOverlay(imageSource: string, text?: PinText): Promi
   if (!hasAnyText(clean)) {
     return resized;
   }
-
-  const fontUrl = await getFontDataUrl();
 
   const topBannerHeight = clean.middle ? 115 : 95;
   const showTopBanner = !!(clean.top || clean.middle);
@@ -75,7 +66,7 @@ export async function addTextOverlay(imageSource: string, text?: PinText): Promi
         <style type="text/css">
           @font-face {
             font-family: 'PinFont';
-            src: url('${fontUrl}') format('truetype');
+            src: url('${FONT_DATA_URL}') format('truetype');
           }
         </style>
       </defs>
