@@ -276,17 +276,27 @@ export default function DesignPage() {
           </div>
         )}
 
-        {/* === GENERATING SPINNER === */}
+        {/* === GENERATING — PLAY A GAME WHILE YOU WAIT === */}
         {generating && !draft && (
-          <div className="animate-fade-in flex flex-col items-center py-10">
-            <div className="w-64 h-64 bg-charcoal rounded-2xl border border-crimson/20 flex flex-col items-center justify-center gap-4"
-              style={{ boxShadow: '0 0 30px rgba(255,85,0,0.1)' }}>
-              <div className="w-14 h-14 border-3 border-fire border-t-transparent rounded-full animate-spin"/>
-              <div className="text-center">
-                <p className="text-sp-white text-lg font-bold">Creating your pin...</p>
-                <p className="text-gray-400 text-sm mt-1">AI is drawing your design (~30s)</p>
-              </div>
+          <div className="animate-fade-in flex flex-col items-center">
+            {/* Status bar */}
+            <div className="w-full max-w-md flex items-center gap-3 mb-3 px-2">
+              <div className="w-6 h-6 border-2 border-fire border-t-transparent rounded-full animate-spin shrink-0"/>
+              <p className="text-sp-white text-base font-bold">Creating your pin...</p>
+              <p className="text-gray-500 text-sm ml-auto">~30s</p>
             </div>
+
+            {/* Game iframe */}
+            <div className="w-full max-w-md rounded-2xl overflow-hidden border border-gray-800 bg-black" style={{ aspectRatio: '3/4' }}>
+              <iframe
+                src={`https://braydensgames.com/${Math.random() > 0.5 ? 'last-stand' : 'slide'}.html`}
+                className="w-full h-full border-0"
+                title="Play while you wait"
+                sandbox="allow-scripts allow-same-origin"
+              />
+            </div>
+
+            <p className="text-gray-500 text-sm mt-2 text-center">Play a game while the AI works</p>
           </div>
         )}
 
