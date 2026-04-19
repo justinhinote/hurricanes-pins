@@ -98,7 +98,7 @@ export default async function HomePage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-fire text-sm sm:text-base font-bold tracking-widest uppercase mt-3 animate-float-up-delay-1 text-center" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
+          <p className="text-fire text-base sm:text-lg font-bold tracking-widest uppercase mt-3 animate-float-up-delay-1 text-center" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
             Cooperstown 2026 &mdash; Pin Design Contest
           </p>
 
@@ -130,29 +130,29 @@ export default async function HomePage() {
 
       {/* ===== HOW IT WORKS ===== */}
       <div className="px-6 max-w-lg mx-auto py-10" style={{ background: 'linear-gradient(to bottom, #0D0000 0%, #0D0000 100%)' }}>
-        <h2 className="text-sp-white font-bold text-xl mb-5 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+        <h2 className="text-sp-white font-bold text-2xl mb-5 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
           HOW IT WORKS
         </h2>
         <div className="flex flex-col gap-4">
           <div className="flex gap-4 items-start">
             <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">1</span>
             <div>
-              <p className="text-sp-white font-bold text-sm">Design Your Pin</p>
-              <p className="text-gray-500 text-sm leading-relaxed mt-0.5">Describe your dream pin and AI creates it. Spinners, oversized shapes, dangling charms, light-up styles — the wildest pins get traded most at Cooperstown.</p>
+              <p className="text-sp-white font-bold text-base">Design Your Pin</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Describe your dream pin and AI creates it. Spinners, oversized shapes, dangling charms, light-up styles — the wildest pins get traded most at Cooperstown.</p>
             </div>
           </div>
           <div className="flex gap-4 items-start">
             <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">2</span>
             <div>
-              <p className="text-sp-white font-bold text-sm">Cash or Trash</p>
-              <p className="text-gray-500 text-sm leading-relaxed mt-0.5">Swipe through everyone&apos;s designs. CASH the pins you&apos;d want to trade. TRASH the ones you wouldn&apos;t. Blind voting — nobody sees the scores.</p>
+              <p className="text-sp-white font-bold text-base">Cash or Trash</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Swipe through everyone&apos;s designs. CASH the pins you&apos;d want to trade. TRASH the ones you wouldn&apos;t. Blind voting — nobody sees the scores.</p>
             </div>
           </div>
           <div className="flex gap-4 items-start">
             <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">3</span>
             <div>
-              <p className="text-sp-white font-bold text-sm">Winners Get Made</p>
-              <p className="text-gray-500 text-sm leading-relaxed mt-0.5">Top-voted designs get manufactured as real trading pins. The best become your Cooperstown collection — a series of 3 collectibles plus a special mid-week drop.</p>
+              <p className="text-sp-white font-bold text-base">Winners Get Made</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Top-voted designs get manufactured as real trading pins. The best become your Cooperstown collection — a series of 3 collectibles plus a special mid-week drop.</p>
             </div>
           </div>
         </div>
@@ -165,17 +165,17 @@ export default async function HomePage() {
             <div className="flex justify-around">
               <div className="text-center">
                 <p className="text-3xl text-sp-white font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_pins}</p>
-                <p className="text-gray-600 text-xs uppercase tracking-wider mt-1">Designs</p>
+                <p className="text-gray-400 text-sm uppercase tracking-wider mt-1">Designs</p>
               </div>
               <div className="w-px bg-gray-800"/>
               <div className="text-center">
                 <p className="text-3xl text-fire font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_votes}</p>
-                <p className="text-gray-600 text-xs uppercase tracking-wider mt-1">Votes</p>
+                <p className="text-gray-400 text-sm uppercase tracking-wider mt-1">Votes</p>
               </div>
               <div className="w-px bg-gray-800"/>
               <div className="text-center">
                 <p className="text-3xl text-sp-white font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_players}</p>
-                <p className="text-gray-600 text-xs uppercase tracking-wider mt-1">Voters</p>
+                <p className="text-gray-400 text-sm uppercase tracking-wider mt-1">Voters</p>
               </div>
             </div>
           </div>
@@ -185,10 +185,10 @@ export default async function HomePage() {
       {/* ===== TOP DESIGNS RANKINGS ===== */}
       {rankedPins.length > 0 && (
         <div className="px-6 max-w-lg mx-auto pb-10">
-          <h2 className="text-sp-white font-bold text-xl mb-1 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+          <h2 className="text-sp-white font-bold text-2xl mb-1 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
             TOP DESIGNS
           </h2>
-          <p className="text-gray-600 text-xs text-center mb-5 uppercase tracking-wider">
+          <p className="text-gray-400 text-sm text-center mb-5 uppercase tracking-wider">
             Ranked by popular vote
           </p>
 
@@ -206,16 +206,16 @@ export default async function HomePage() {
                   key={pin.id}
                   className={`flex items-center gap-3 rounded-xl p-3 ${isTop3 ? 'bg-charcoal border border-gray-800' : 'bg-charcoal/40'}`}
                 >
-                  <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border ${isTop3 ? rankColors[i] : 'text-gray-600 border-gray-800 bg-black/30'}`}>
+                  <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border ${isTop3 ? rankColors[i] : 'text-gray-400 border-gray-800 bg-black/30'}`}>
                     {i + 1}
                   </div>
                   <div className={`shrink-0 w-14 h-14 relative rounded-lg overflow-hidden bg-black/40 ${isTop3 ? `ring-2 ${ringColors[i]}` : ''}`}>
                     <Image src={pin.image_url} alt={`#${i + 1}`} fill className="object-contain" sizes="56px" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sp-white text-sm truncate">{pin.concept_text}</p>
+                    <p className="text-sp-white text-base truncate">{pin.concept_text}</p>
                     {pin.creator_name && (
-                      <p className="text-gray-600 text-xs mt-0.5">by {pin.creator_name}</p>
+                      <p className="text-gray-400 text-sm mt-0.5">by {pin.creator_name}</p>
                     )}
                   </div>
                 </div>
@@ -230,16 +230,16 @@ export default async function HomePage() {
               className="flex-1 text-center bg-crimson text-sp-white font-bold px-6 py-4 rounded-xl active:scale-95 transition-all"
               style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(196,18,48,0.4)' }}
             >
-              <span className="text-sm uppercase tracking-widest">Vote Now</span>
-              <span className="block text-[10px] text-sp-white/60 uppercase tracking-wider mt-0.5 font-normal">Change the Rankings</span>
+              <span className="text-lg uppercase tracking-widest">Vote Now</span>
+              <span className="block text-xs text-sp-white/60 uppercase tracking-wider mt-0.5 font-normal">Change the Rankings</span>
             </Link>
             <Link
               href={hasSession ? '/design' : '/join'}
               className="flex-1 text-center bg-charcoal border-2 border-fire/40 text-sp-white font-bold px-6 py-4 rounded-xl active:scale-95 transition-all hover:border-fire/70"
               style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}
             >
-              <span className="text-sm uppercase tracking-widest text-fire">Design</span>
-              <span className="block text-[10px] text-gray-500 uppercase tracking-wider mt-0.5 font-normal">Think You Can Do Better? Prove It</span>
+              <span className="text-lg uppercase tracking-widest text-fire">Design</span>
+              <span className="block text-xs text-gray-400 uppercase tracking-wider mt-0.5 font-normal">Think You Can Do Better? Prove It</span>
             </Link>
           </div>
         </div>
@@ -247,11 +247,11 @@ export default async function HomePage() {
 
       {/* ===== FOOTER ===== */}
       <div className="px-6 py-8 text-center border-t border-gray-900">
-        <span className="text-gray-700 text-lg font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
-        <p className="text-gray-700 text-xs">
+        <span className="text-gray-500 text-lg font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
+        <p className="text-gray-500 text-sm">
           South Park Hurricanes &bull; SPYA Baseball &bull; Cooperstown 2026
         </p>
-        <Link href="/admin/login" className="text-gray-800 text-xs hover:text-gray-600 transition-colors mt-2 inline-block">
+        <Link href="/admin/login" className="text-gray-500 text-sm hover:text-gray-400 transition-colors mt-2 inline-block">
           Admin
         </Link>
       </div>

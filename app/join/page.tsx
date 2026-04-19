@@ -62,10 +62,10 @@ export default function JoinPage() {
             <h1 className="font-anton text-5xl text-crimson leading-none tracking-tight" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '2px 2px 0 #8B0D22, 4px 4px 8px rgba(0,0,0,0.8)' }}>
               HURRICANES
             </h1>
-            <p className="mt-3 text-fire text-sm font-bold tracking-widest uppercase">
+            <p className="mt-3 text-fire text-base font-bold tracking-widest uppercase">
               Cooperstown 2026
             </p>
-            <p className="mt-1 text-gray-500 text-xs text-center">
+            <p className="mt-1 text-gray-400 text-sm text-center">
               Design a pin &bull; Vote on everyone&apos;s &bull; Best ones get made
             </p>
           </div>
@@ -74,7 +74,7 @@ export default function JoinPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <div>
-            <label htmlFor="name" className="block text-sp-white text-sm font-bold tracking-wider uppercase mb-2">
+            <label htmlFor="name" className="block text-sp-white text-base font-bold tracking-wider uppercase mb-2">
               Your Name
             </label>
             <input
@@ -85,12 +85,12 @@ export default function JoinPage() {
               placeholder="Enter your name..."
               autoFocus
               autoComplete="given-name"
-              className="w-full bg-charcoal border-2 border-charcoal text-sp-white text-lg px-4 py-4 rounded-lg focus:outline-none focus:border-crimson transition-colors placeholder-gray-600"
+              className="w-full bg-charcoal border-2 border-charcoal text-sp-white text-lg px-4 py-4 rounded-lg focus:outline-none focus:border-crimson transition-colors placeholder-gray-500"
             />
           </div>
 
           {error && (
-            <p className="text-fire text-sm text-center">{error}</p>
+            <p className="text-fire text-base text-center">{error}</p>
           )}
 
           <button
@@ -103,7 +103,7 @@ export default function JoinPage() {
           </button>
         </form>
 
-        <p className="text-gray-600 text-xs text-center">
+        <p className="text-gray-400 text-sm text-center">
           Vote on pin designs. No scores shown until the end.
         </p>
       </div>

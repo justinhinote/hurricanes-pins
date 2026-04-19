@@ -16,17 +16,17 @@ export default async function WinnersPage() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
           <span className="text-crimson text-4xl font-bold block mb-4" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
-          <h1 className="font-bold text-4xl text-sp-white leading-tight" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '2px 2px 0 #C41230' }}>
+          <h1 className="font-bold text-5xl text-sp-white leading-tight" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '2px 2px 0 #C41230' }}>
             WINNING PINS
           </h1>
-          <p className="text-fire text-sm font-bold tracking-widest uppercase mt-2">
+          <p className="text-fire text-base font-bold tracking-widest uppercase mt-2">
             Cooperstown 2026 &mdash; South Park Hurricanes
           </p>
         </div>
 
         {winners.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-gray-500 text-lg">Winners coming soon. Stay tuned!</p>
+            <p className="text-gray-400 text-xl">Winners coming soon. Stay tuned!</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
@@ -50,7 +50,7 @@ export default async function WinnersPage() {
           </div>
         )}
 
-        <p className="text-center text-gray-600 text-xs mt-10">
+        <p className="text-center text-gray-400 text-sm mt-10">
           These designs were selected by the team through blind voting.
         </p>
       </div>

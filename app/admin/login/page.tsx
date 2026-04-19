@@ -33,7 +33,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
         <span className="text-crimson text-4xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
-        <h1 className="font-bold text-3xl text-sp-white text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+        <h1 className="font-bold text-4xl text-sp-white text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
           ADMIN ACCESS
         </h1>
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
@@ -45,11 +45,11 @@ export default function AdminLoginPage() {
             autoFocus
             className="w-full bg-charcoal border-2 border-charcoal text-sp-white text-lg px-4 py-4 rounded-lg focus:outline-none focus:border-crimson transition-colors"
           />
-          {error && <p className="text-fire text-sm text-center">{error}</p>}
+          {error && <p className="text-fire text-base text-center">{error}</p>}
           <button
             type="submit"
             disabled={!password || loading}
-            className="w-full bg-crimson text-sp-white font-bold text-xl py-4 rounded-lg uppercase tracking-widest disabled:opacity-50 active:scale-95 transition-all"
+            className="w-full bg-crimson text-sp-white font-bold text-2xl py-4 rounded-lg uppercase tracking-widest disabled:opacity-50 active:scale-95 transition-all"
           >
             {loading ? 'Checking...' : 'Enter'}
           </button>

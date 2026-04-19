@@ -7,7 +7,7 @@ import type { Round } from '@/lib/types';
 const STATUS_COLORS: Record<string, string> = {
   active: 'text-fire border-fire/50 bg-fire/10',
   draft: 'text-gray-400 border-gray-700 bg-gray-800/30',
-  archived: 'text-gray-600 border-gray-800 bg-gray-900/30',
+  archived: 'text-gray-400 border-gray-800 bg-gray-900/30',
 };
 
 export default function RoundsPage() {
@@ -51,7 +51,7 @@ export default function RoundsPage() {
         <Link href="/admin" className="text-gray-500 hover:text-gray-300 transition-colors">
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
         </Link>
-        <h1 className="font-bold text-2xl text-sp-white" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>MANAGE ROUNDS</h1>
+        <h1 className="font-bold text-3xl text-sp-white" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>MANAGE ROUNDS</h1>
       </div>
 
       {/* Create new round */}
@@ -94,7 +94,7 @@ export default function RoundsPage() {
                 <span className="text-sp-white font-bold truncate">{round.name}</span>
               </div>
               {round.brief && (
-                <p className="text-gray-500 text-xs truncate">{round.brief}</p>
+                <p className="text-gray-400 text-sm truncate">{round.brief}</p>
               )}
             </div>
             {round.status !== 'active' && (
@@ -109,7 +109,7 @@ export default function RoundsPage() {
           </div>
         ))}
         {rounds.length === 0 && (
-          <p className="text-gray-600 text-sm text-center py-8">No rounds yet.</p>
+          <p className="text-gray-400 text-base text-center py-8">No rounds yet.</p>
         )}
       </div>
     </div>

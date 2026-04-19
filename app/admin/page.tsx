@@ -30,23 +30,23 @@ export default async function AdminHomePage() {
       <div className="flex items-center gap-4 mb-8">
         <span className="text-crimson text-3xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
         <div>
-          <h1 className="font-bold text-2xl text-sp-white" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>ADMIN PANEL</h1>
-          <p className="text-gray-500 text-sm">South Park Hurricanes — Pin Contest</p>
+          <h1 className="font-bold text-3xl text-sp-white" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>ADMIN PANEL</h1>
+          <p className="text-gray-400 text-base">South Park Hurricanes — Pin Contest</p>
         </div>
       </div>
 
       {activeRound ? (
         <div className="bg-charcoal border border-crimson/30 rounded-xl p-5 mb-8">
-          <p className="text-fire text-xs font-bold uppercase tracking-widest mb-1">Active Round</p>
-          <p className="text-sp-white text-xl font-bold">{activeRound.name}</p>
-          <div className="flex gap-6 mt-3 text-sm text-gray-400">
+          <p className="text-fire text-sm font-bold uppercase tracking-widest mb-1">Active Round</p>
+          <p className="text-sp-white text-2xl font-bold">{activeRound.name}</p>
+          <div className="flex gap-6 mt-3 text-base text-gray-400">
             <span>{activeRound.vote_count} votes cast</span>
             <span>{activeRound.player_count} players voted</span>
           </div>
         </div>
       ) : (
         <div className="bg-charcoal border border-gray-800 rounded-xl p-5 mb-8">
-          <p className="text-gray-500 text-sm">No active round. Go to Manage Rounds to set one up.</p>
+          <p className="text-gray-400 text-base">No active round. Go to Manage Rounds to set one up.</p>
         </div>
       )}
 
@@ -59,9 +59,9 @@ export default async function AdminHomePage() {
           >
             <div>
               <p className="text-sp-white font-bold group-hover:text-crimson transition-colors">{item.label}</p>
-              <p className="text-gray-500 text-sm mt-0.5">{item.desc}</p>
+              <p className="text-gray-400 text-base mt-0.5">{item.desc}</p>
             </div>
-            <svg className="w-5 h-5 text-gray-600 group-hover:text-crimson transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="w-5 h-5 text-gray-400 group-hover:text-crimson transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9 18 15 12 9 6"/>
             </svg>
           </Link>
@@ -69,12 +69,12 @@ export default async function AdminHomePage() {
       </div>
 
       <div className="flex gap-3 mt-8">
-        <Link href="/" className="text-gray-600 text-sm hover:text-gray-400 transition-colors">Player view</Link>
-        <span className="text-gray-700">|</span>
-        <Link href="/winners" className="text-gray-600 text-sm hover:text-gray-400 transition-colors">Winners page</Link>
-        <span className="text-gray-700">|</span>
+        <Link href="/" className="text-gray-400 text-sm hover:text-gray-300 transition-colors">Player view</Link>
+        <span className="text-gray-500">|</span>
+        <Link href="/winners" className="text-gray-400 text-sm hover:text-gray-300 transition-colors">Winners page</Link>
+        <span className="text-gray-500">|</span>
         <form action="/api/auth/logout" method="POST" className="inline">
-          <button type="submit" className="text-gray-600 text-sm hover:text-fire transition-colors">Log out</button>
+          <button type="submit" className="text-gray-400 text-sm hover:text-fire transition-colors">Log out</button>
         </form>
       </div>
     </div>

@@ -123,13 +123,13 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
             <polyline points="20,42 34,56 60,28" stroke="#22c55e" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
-        <h2 className="font-bold text-3xl text-sp-white mb-3" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+        <h2 className="font-bold text-4xl text-sp-white mb-3" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
           ALL DONE!
         </h2>
-        <p className="text-gray-400 text-lg max-w-xs">
+        <p className="text-gray-400 text-xl max-w-xs">
           You voted on all {voteCount} pin{voteCount !== 1 ? 's' : ''}. Nice work, Hurricane!
         </p>
-        <p className="mt-4 text-gray-600 text-sm max-w-xs">
+        <p className="mt-4 text-gray-400 text-base max-w-xs">
           Come back later to see if new designs have been added. Go design your own pin!
         </p>
         <p className="mt-8 text-fire text-sm font-bold tracking-widest uppercase">
@@ -159,14 +159,14 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
 
       {/* Instructions banner */}
       <div className="px-4 pt-4 pb-2">
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-1.5 text-red-500">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"/></svg>
             <span className="font-bold uppercase tracking-wide">Swipe left = Trash</span>
           </div>
           <div className="flex items-center gap-1.5 text-green-500">
             <span className="font-bold uppercase tracking-wide">Swipe right = Cash</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
         </div>
       </div>

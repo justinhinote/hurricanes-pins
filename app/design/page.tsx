@@ -182,10 +182,10 @@ export default function DesignPage() {
         <div className="flex items-center gap-3">
           <span className="text-crimson text-2xl font-bold shrink-0" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
           <div className="flex-1">
-            <h1 className="text-sp-white text-lg font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+            <h1 className="text-sp-white text-xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
               DESIGN YOUR PIN
             </h1>
-            <p className="text-gray-600 text-xs">Best designs get made into real trading pins</p>
+            <p className="text-gray-400 text-sm">Best designs get made into real trading pins</p>
           </div>
           {attemptsRemaining !== null && (
             <div className="flex items-center gap-1">
@@ -195,7 +195,7 @@ export default function DesignPage() {
                   className={`w-2 h-2 rounded-full ${i < (5 - attemptsRemaining) ? 'bg-crimson' : 'bg-gray-700'}`}
                 />
               ))}
-              <span className="text-gray-600 text-[10px] ml-1">{attemptsRemaining}</span>
+              <span className="text-gray-400 text-xs ml-1">{attemptsRemaining}</span>
             </div>
           )}
         </div>
@@ -216,13 +216,13 @@ export default function DesignPage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sp-white text-sm font-bold">Describe your dream pin</p>
-                  <p className="text-gray-500 text-xs mt-1 leading-relaxed">Pick a style below or type your own idea. Spinners, oversized shapes, glow effects — the crazier the better for Cooperstown trading.</p>
+                  <p className="text-sp-white text-base font-bold">Describe your dream pin</p>
+                  <p className="text-gray-400 text-sm mt-1 leading-relaxed">Pick a style below or type your own idea. Spinners, oversized shapes, glow effects — the crazier the better for Cooperstown trading.</p>
                 </div>
               </div>
             </div>
 
-            <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-2.5 px-1">Pick a style</p>
+            <p className="text-gray-400 text-sm uppercase font-bold tracking-widest mb-2.5 px-1">Pick a style</p>
             <div className="grid grid-cols-4 gap-2">
               {STYLE_TEMPLATES.map(t => (
                 <button
@@ -233,7 +233,7 @@ export default function DesignPage() {
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-all group-hover:scale-110" style={{ background: `${t.color}15`, border: `1.5px solid ${t.color}35` }}>
                     <div className="w-5 h-5 rounded-full" style={{ background: `${t.color}`, boxShadow: `0 0 8px ${t.color}40` }} />
                   </div>
-                  <span className="text-sp-white text-[10px] font-bold leading-tight text-center">{t.name}</span>
+                  <span className="text-sp-white text-xs font-bold leading-tight text-center">{t.name}</span>
                 </button>
               ))}
             </div>
@@ -246,7 +246,7 @@ export default function DesignPage() {
             if (msg.role === 'system') {
               return (
                 <div key={i} className="flex justify-center">
-                  <p className="text-gray-500 text-sm text-center max-w-xs bg-charcoal/50 rounded-xl px-4 py-2.5">
+                  <p className="text-gray-400 text-base text-center max-w-xs bg-charcoal/50 rounded-xl px-4 py-2.5">
                     {msg.text}
                   </p>
                 </div>
@@ -256,7 +256,7 @@ export default function DesignPage() {
               return (
                 <div key={i} className="flex justify-end">
                   <div className="bg-crimson rounded-2xl rounded-br-sm px-4 py-3 max-w-[80%]">
-                    <p className="text-sp-white text-sm">{msg.text}</p>
+                    <p className="text-sp-white text-base">{msg.text}</p>
                   </div>
                 </div>
               );
@@ -276,7 +276,7 @@ export default function DesignPage() {
                       />
                     </div>
                     <div className="px-3 py-2 border-t border-gray-800">
-                      <p className="text-fire text-xs font-bold">In the contest!</p>
+                      <p className="text-fire text-sm font-bold">In the contest!</p>
                     </div>
                   </div>
                 </div>
@@ -294,8 +294,8 @@ export default function DesignPage() {
                   <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, rgba(196,18,48,0.08) 0%, transparent 70%)' }}/>
                   <div className="w-12 h-12 border-3 border-fire border-t-transparent rounded-full animate-spin"/>
                   <div className="text-center">
-                    <p className="text-sp-white text-sm font-bold">Creating your pin...</p>
-                    <p className="text-gray-600 text-xs mt-1">AI is drawing your design (~30s)</p>
+                    <p className="text-sp-white text-base font-bold">Creating your pin...</p>
+                    <p className="text-gray-400 text-sm mt-1">AI is drawing your design (~30s)</p>
                   </div>
                 </div>
               </div>
@@ -316,7 +316,7 @@ export default function DesignPage() {
                 <button
                   key={mod}
                   onClick={() => handleModifier(mod)}
-                  className="shrink-0 text-xs px-3 py-1.5 bg-charcoal border border-gray-700 text-gray-400 rounded-full hover:border-crimson/50 hover:text-sp-white transition-colors active:scale-95 whitespace-nowrap"
+                  className="shrink-0 text-sm px-3 py-1.5 bg-charcoal border border-gray-700 text-gray-400 rounded-full hover:border-crimson/50 hover:text-sp-white transition-colors active:scale-95 whitespace-nowrap"
                 >
                   {mod}
                 </button>
@@ -332,7 +332,7 @@ export default function DesignPage() {
               onChange={e => setDescription(e.target.value)}
               placeholder="Describe your pin idea..."
               disabled={generating}
-              className="flex-1 bg-charcoal border border-gray-700 text-sp-white text-sm px-4 py-3 rounded-full focus:outline-none focus:border-crimson transition-colors disabled:opacity-50 placeholder-gray-600"
+              className="flex-1 bg-charcoal border border-gray-700 text-sp-white text-base px-4 py-3 rounded-full focus:outline-none focus:border-crimson transition-colors disabled:opacity-50 placeholder-gray-500"
             />
             <button
               type="submit"
@@ -344,14 +344,14 @@ export default function DesignPage() {
               </svg>
             </button>
           </form>
-          {error && <p className="text-fire text-xs mt-1 px-2">{error}</p>}
+          {error && <p className="text-fire text-sm mt-1 px-2">{error}</p>}
         </div>
       ) : (
         <div className="fixed bottom-14 left-0 right-0 z-30 bg-black/95 backdrop-blur-sm border-t border-gray-800 px-4 py-3 text-center">
-          <p className="text-gray-500 text-sm mb-2">All {submittedCount} of your pins are in the contest!</p>
+          <p className="text-gray-400 text-base mb-2">All {submittedCount} of your pins are in the contest!</p>
           <Link
             href="/vote"
-            className="inline-block bg-crimson text-sp-white font-bold px-8 py-3 rounded-full uppercase tracking-widest text-sm active:scale-95 transition-all"
+            className="inline-block bg-crimson text-sp-white font-bold px-8 py-3 rounded-full uppercase tracking-widest text-lg active:scale-95 transition-all"
           >
             Vote Now
           </Link>

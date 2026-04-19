@@ -107,13 +107,13 @@ export default function GeneratePage() {
         <Link href="/admin" className="text-gray-500 hover:text-gray-300 transition-colors">
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
         </Link>
-        <h1 className="font-bold text-2xl text-sp-white" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>GENERATE PINS</h1>
+        <h1 className="font-bold text-3xl text-sp-white" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>GENERATE PINS</h1>
       </div>
 
       {/* Config panel */}
       <div className="bg-charcoal border border-gray-800 rounded-xl p-5 mb-6 flex flex-col gap-4">
         <div>
-          <label className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-1.5 block">Round</label>
+          <label className="text-gray-400 text-sm uppercase font-bold tracking-wider mb-1.5 block">Round</label>
           <select
             value={selectedRound}
             onChange={e => setSelectedRound(e.target.value ? parseInt(e.target.value) : '')}
@@ -126,7 +126,7 @@ export default function GeneratePage() {
           </select>
         </div>
         <div>
-          <label className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-1.5 block">Design Brief</label>
+          <label className="text-gray-400 text-sm uppercase font-bold tracking-wider mb-1.5 block">Design Brief</label>
           <textarea
             value={brief}
             onChange={e => setBrief(e.target.value)}
@@ -136,7 +136,7 @@ export default function GeneratePage() {
           />
         </div>
         <div>
-          <label className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-1.5 block">Number of Concepts</label>
+          <label className="text-gray-400 text-sm uppercase font-bold tracking-wider mb-1.5 block">Number of Concepts</label>
           <input
             type="number"
             min={1}
@@ -155,7 +155,7 @@ export default function GeneratePage() {
         </button>
       </div>
 
-      {error && <p className="text-fire text-sm mb-4">{error}</p>}
+      {error && <p className="text-fire text-base mb-4">{error}</p>}
 
       {/* Concepts list */}
       {concepts.length > 0 && (
@@ -172,7 +172,7 @@ export default function GeneratePage() {
                 : `Render ${selectedCount} Image${selectedCount !== 1 ? 's' : ''}`}
             </button>
           </div>
-          <p className="text-gray-500 text-xs -mt-2">Note: DALL-E generates 1 image per 12 seconds. {selectedCount} images will take ~{selectedCount * 12}s.</p>
+          <p className="text-gray-400 text-sm -mt-2">Note: DALL-E generates 1 image per 12 seconds. {selectedCount} images will take ~{selectedCount * 12}s.</p>
 
           {concepts.map((concept, idx) => (
             <div
@@ -189,10 +189,10 @@ export default function GeneratePage() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sp-white text-sm leading-relaxed">{concept.concept}</p>
+                  <p className="text-sp-white text-base leading-relaxed">{concept.concept}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {[...concept.tags.color_palette, ...concept.tags.style].slice(0, 5).map(tag => (
-                      <span key={tag} className="text-xs px-2 py-0.5 bg-black/40 text-gray-400 rounded border border-gray-700">{tag}</span>
+                      <span key={tag} className="text-sm px-2 py-0.5 bg-black/40 text-gray-400 rounded border border-gray-700">{tag}</span>
                     ))}
                   </div>
                 </div>
@@ -208,7 +208,7 @@ export default function GeneratePage() {
                 )}
                 {concept.status === 'error' && (
                   <div className="shrink-0 w-16 h-16 bg-black/40 rounded-lg flex items-center justify-center">
-                    <span className="text-fire text-xs">Error</span>
+                    <span className="text-fire text-sm">Error</span>
                   </div>
                 )}
               </div>
@@ -221,8 +221,8 @@ export default function GeneratePage() {
         <div className="bg-fire/10 border border-fire/40 rounded-xl p-4 text-center">
           <p className="text-fire font-bold">{doneCount} pin{doneCount !== 1 ? 's' : ''} published to the active round!</p>
           <div className="flex gap-3 justify-center mt-3">
-            <Link href="/admin/results" className="text-sm text-gray-400 hover:text-sp-white transition-colors">View Results</Link>
-            <Link href="/admin" className="text-sm text-gray-400 hover:text-sp-white transition-colors">Back to Admin</Link>
+            <Link href="/admin/results" className="text-base text-gray-400 hover:text-sp-white transition-colors">View Results</Link>
+            <Link href="/admin" className="text-base text-gray-400 hover:text-sp-white transition-colors">Back to Admin</Link>
           </div>
         </div>
       )}
