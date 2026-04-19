@@ -1,4 +1,7 @@
 import sharp from 'sharp';
+import { writeFileSync, existsSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 import { sanitizePinText, hasAnyText, type PinText } from './pin-text';
 import { ANTON_BASE64 } from './font-data';
 
@@ -6,12 +9,48 @@ function escapeXml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
-// Embed the font directly into the SVG as a data: URL. librsvg on Vercel's
-// Linux runtime has no Impact / Helvetica / etc., which silently renders all
-// glyphs as .notdef boxes. Inlining the bytes (vs reading from disk) means
-// the font is guaranteed to be in the function bundle — no reliance on
-// outputFileTracingIncludes correctly catching the runtime read.
-const FONT_DATA_URL = `data:font/ttf;base64,${ANTON_BASE64}`;
+// librsvg (sharp's SVG renderer) does NOT support @font-face with data URIs —
+// it only uses system-installed fonts. Vercel's Linux runtime ships no font
+// with Latin glyphs, so SVG <text> renders as .notdef boxes. Workaround:
+// write the bundled TTF to /tmp at first use and render text via sharp.text(),
+// which uses Pango directly and accepts an arbitrary fontfile path.
+const FONT_PATH = join(tmpdir(), 'pin-anton.ttf');
+let fontReady = false;
+function ensureFont(): string {
+  if (!fontReady) {
+    if (!existsSync(FONT_PATH)) {
+      writeFileSync(FONT_PATH, Buffer.from(ANTON_BASE64, 'base64'));
+    }
+    fontReady = true;
+  }
+  return FONT_PATH;
+}
+
+interface RenderedText {
+  buffer: Buffer;
+  width: number;
+  height: number;
+}
+
+async function renderText(text: string, fontSize: number, hexColor: string): Promise<RenderedText> {
+  // Build a pango markup string with explicit color and tracking.
+  // Anton renders narrow, so use modest letter_spacing to mimic Impact look.
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const markup = `<span foreground="${hexColor}" letter_spacing="2000">${escaped}</span>`;
+
+  const out = await sharp({
+    text: {
+      text: markup,
+      fontfile: ensureFont(),
+      font: `Anton ${fontSize}`,
+      rgba: true,
+      align: 'centre',
+      dpi: 72,
+    },
+  }).png().toBuffer({ resolveWithObject: true });
+
+  return { buffer: out.data, width: out.info.width, height: out.info.height };
+}
 
 export async function addTextOverlay(imageSource: string, text?: PinText): Promise<Buffer> {
   let imageBuffer: Buffer;
@@ -37,48 +76,45 @@ export async function addTextOverlay(imageSource: string, text?: PinText): Promi
   const topBannerHeight = clean.middle ? 115 : 95;
   const showTopBanner = !!(clean.top || clean.middle);
 
-  const topBanner = showTopBanner ? `
-      <rect x="0" y="0" width="1024" height="${topBannerHeight}" fill="rgba(13,0,0,0.85)"/>
-      <rect x="0" y="${topBannerHeight - 2}" width="1024" height="3" fill="#C41230"/>
-      ${clean.top ? `
-      <text x="512" y="${clean.middle ? 50 : 60}" text-anchor="middle"
-            font-family="PinFont" font-size="48" letter-spacing="3"
-            fill="#F5F0F0">${escapeXml(clean.top)}</text>
-      ` : ''}
-      ${clean.middle ? `
-      <text x="512" y="92" text-anchor="middle"
-            font-family="PinFont" font-size="24" letter-spacing="6"
-            fill="#C41230">${escapeXml(clean.middle)}</text>
-      ` : ''}
-  ` : '';
+  // Build SVG with just the rectangles — text is rendered separately.
+  let svgRects = '';
+  if (showTopBanner) {
+    svgRects += `<rect x="0" y="0" width="1024" height="${topBannerHeight}" fill="rgba(13,0,0,0.85)"/>`;
+    svgRects += `<rect x="0" y="${topBannerHeight - 2}" width="1024" height="3" fill="#C41230"/>`;
+  }
+  if (clean.bottom) {
+    svgRects += `<rect x="0" y="929" width="1024" height="95" fill="rgba(13,0,0,0.85)"/>`;
+    svgRects += `<rect x="0" y="929" width="1024" height="3" fill="#C41230"/>`;
+  }
+  const svg = `<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">${svgRects}</svg>`;
 
-  const bottomBanner = clean.bottom ? `
-      <rect x="0" y="929" width="1024" height="95" fill="rgba(13,0,0,0.85)"/>
-      <rect x="0" y="929" width="1024" height="3" fill="#C41230"/>
-      <text x="512" y="990" text-anchor="middle"
-            font-family="PinFont" font-size="48" letter-spacing="5"
-            fill="#F5F0F0">${escapeXml(clean.bottom)}</text>
-  ` : '';
+  const composites: sharp.OverlayOptions[] = [
+    { input: Buffer.from(svg), top: 0, left: 0 },
+  ];
 
-  const svgOverlay = `
-    <svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <style type="text/css">
-          @font-face {
-            font-family: 'PinFont';
-            src: url('${FONT_DATA_URL}') format('truetype');
-          }
-        </style>
-      </defs>
-      ${topBanner}
-      ${bottomBanner}
-    </svg>
-  `;
+  // Render each text line and place it
+  if (clean.top) {
+    const t = await renderText(clean.top, 48, '#F5F0F0');
+    const left = Math.max(0, Math.floor((1024 - t.width) / 2));
+    const top = clean.middle ? 18 : 28;
+    composites.push({ input: t.buffer, top, left });
+  }
+  if (clean.middle) {
+    const t = await renderText(clean.middle, 24, '#C41230');
+    const left = Math.max(0, Math.floor((1024 - t.width) / 2));
+    composites.push({ input: t.buffer, top: 76, left });
+  }
+  if (clean.bottom) {
+    const t = await renderText(clean.bottom, 48, '#F5F0F0');
+    const left = Math.max(0, Math.floor((1024 - t.width) / 2));
+    composites.push({ input: t.buffer, top: 952, left });
+  }
 
-  const result = await sharp(resized)
-    .composite([{ input: Buffer.from(svgOverlay), top: 0, left: 0 }])
-    .png()
-    .toBuffer();
-
+  const result = await sharp(resized).composite(composites).png().toBuffer();
   return result;
 }
+
+// escapeXml retained for SVG content but no longer needed for text — keeping
+// the import side-effects minimal. (Function kept exported-internal in case
+// future SVG content needs it.)
+export { escapeXml };
