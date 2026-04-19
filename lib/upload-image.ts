@@ -1,22 +1,30 @@
 import { put } from '@vercel/blob';
+import { addTextOverlay } from './text-overlay';
 
 /**
- * Upload an image to Vercel Blob from either a data URL (base64) or a regular URL.
- * Returns the permanent Blob URL and pathname.
+ * Upload an image to Vercel Blob. Applies text overlay (SOUTH PARK HURRICANES /
+ * COOPERSTOWN 2026) to guarantee accurate typography, then uploads.
+ *
+ * @param imageSource - base64 data URL or regular URL
+ * @param blobPath - destination path in Blob storage
+ * @param skipOverlay - set true to upload raw image without text overlay
  */
 export async function uploadImage(
   imageSource: string,
-  blobPath: string
+  blobPath: string,
+  skipOverlay = false
 ): Promise<{ url: string; pathname: string }> {
   let imageBlob: Blob;
 
-  if (imageSource.startsWith('data:')) {
-    // Base64 data URL from gpt-image-1
+  if (!skipOverlay) {
+    // Apply text overlay: composites accurate team text onto the AI artwork
+    const composited = await addTextOverlay(imageSource);
+    imageBlob = new Blob([new Uint8Array(composited)], { type: 'image/png' });
+  } else if (imageSource.startsWith('data:')) {
     const base64Data = imageSource.split(',')[1];
     const buffer = Buffer.from(base64Data, 'base64');
     imageBlob = new Blob([buffer], { type: 'image/png' });
   } else {
-    // Regular URL from DALL-E 3 (expires in 1 hour)
     const res = await fetch(imageSource);
     imageBlob = await res.blob();
   }

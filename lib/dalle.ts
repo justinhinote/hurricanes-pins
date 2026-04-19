@@ -7,15 +7,12 @@ function getOpenAI(): OpenAI {
   return _openai;
 }
 
-// Text accuracy instructions appended to every prompt
+// Force no-text mode: AI generates artwork only, manufacturer handles text
 const TEXT_RULES = `
-CRITICAL TEXT RULES:
-- "HURRICANES" is spelled H-U-R-R-I-C-A-N-E-S
-- "SOUTH PARK" — S-O-U-T-H  P-A-R-K
-- "SPYA" — exactly S-P-Y-A
-- "COOPERSTOWN" — C-O-O-P-E-R-S-T-O-W-N
-- The year is "2026" — digits 2-0-2-6
-- If text cannot be rendered accurately, OMIT it rather than misspelling it.`;
+CRITICAL: DO NOT include ANY text, words, letters, numbers, or typography in the image.
+No team names, no years, no initials, no labels — ZERO text of any kind.
+The design should be purely visual: shapes, colors, effects, composition only.
+Text will be added separately by the pin manufacturer.`;
 
 /**
  * Generate a pin image. Tries Google Imagen 3 first (much better at text),

@@ -81,16 +81,17 @@ Team colors: crimson red (#C41230) and black. Logo: SP diamond shield.
 
 PIN DESIGN PRINCIPLES (optimized for real Cooperstown trading):
 - Strong silhouette first: one bold custom shape (hurricane swirl, storm flag, home plate, baseball with motion). NOT a standard circle.
-- Minimal text: 6-8 words max. Just "South Park Hurricanes", "Cooperstown 2026", "SP", "12U". Text is formed in metal — less is more.
 - One "wow" feature only: spinner OR dangler OR glitter OR glow. Not multiple effects stacked.
 - High contrast: bold color blocking with raised metal lines. Red, black, silver, white, lightning accents. No subtle gradients.
 - Size reference: 1.75-2.0 inch soft enamel pin. Design should read clearly at that size.
 - Trade value matters: would a kid from another state want this immediately?
 
-TEXT ACCURACY IS CRITICAL:
-- Spell out exact text: "HURRICANES" (H-U-R-R-I-C-A-N-E-S), "SOUTH PARK", "SPYA", "COOPERSTOWN", "2026"
-- Prefer minimal text — omit text if it might be misspelled
-- A pin with NO text is better than one with WRONG text
+ABSOLUTELY NO TEXT IN THE IMAGE:
+- Do NOT include any words, letters, numbers, or typography in the prompt
+- No team names, no years, no initials — ZERO text
+- The design is purely visual: shapes, colors, effects, composition
+- Text will be added by the pin manufacturer separately
+- If the user asks for text, acknowledge it but explain the image will show the visual design only
 
 Return ONLY a JSON object: {"image_prompt": "...", "tags": ["...", "..."]}. No markdown.`,
     messages: [{
