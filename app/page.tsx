@@ -92,11 +92,6 @@ export default async function HomePage() {
 
         {/* Hero content — pushed to bottom so team photo stays visible */}
         <div className="relative z-10 flex flex-col items-center justify-end px-6 pb-8 pt-52 sm:pt-72 lg:pt-96">
-          {/* SP Logo */}
-          <div className="animate-logo-glow mb-4">
-            <Image src="/logo.svg" alt="SP Hurricanes" width={90} height={100} priority />
-          </div>
-
           {/* Title */}
           <h1 className="text-4xl sm:text-5xl text-sp-white leading-none tracking-tight text-center animate-float-up" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '3px 3px 0 #0D0000, 0 0 30px rgba(196,18,48,0.5)' }}>
             SOUTH PARK HURRICANES
@@ -252,7 +247,7 @@ export default async function HomePage() {
 
       {/* ===== FOOTER ===== */}
       <div className="px-6 py-8 text-center border-t border-gray-900">
-        <Image src="/logo.svg" alt="SP" width={36} height={40} className="mx-auto mb-3 opacity-40" />
+        <span className="text-gray-700 text-lg font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
         <p className="text-gray-700 text-xs">
           South Park Hurricanes &bull; SPYA Baseball &bull; Cooperstown 2026
         </p>

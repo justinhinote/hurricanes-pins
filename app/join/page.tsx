@@ -54,7 +54,7 @@ export default function JoinPage() {
       <div className="relative z-10 w-full max-w-sm flex flex-col items-center gap-8">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4">
-          <Image src="/logo.svg" alt="South Park Hurricanes" width={90} height={90} priority />
+          <span className="text-crimson text-5xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '2px 2px 0 #0D0000' }}>SP</span>
           <div className="text-center">
             <h1 className="font-anton text-5xl text-sp-white leading-none tracking-tight" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '2px 2px 0 #C41230, 4px 4px 8px rgba(0,0,0,0.8)' }}>
               SOUTH PARK

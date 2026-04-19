@@ -28,7 +28,7 @@ export default async function AdminHomePage() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-10">
       <div className="flex items-center gap-4 mb-8">
-        <Image src="/logo.svg" alt="SP" width={50} height={50} />
+        <span className="text-crimson text-3xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
         <div>
           <h1 className="font-bold text-2xl text-sp-white" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>ADMIN PANEL</h1>
           <p className="text-gray-500 text-sm">South Park Hurricanes — Pin Contest</p>

@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
-        <Image src="/logo.svg" alt="SP Hurricanes" width={70} height={70} />
+        <span className="text-crimson text-4xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
         <h1 className="font-bold text-3xl text-sp-white text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
           ADMIN ACCESS
         </h1>

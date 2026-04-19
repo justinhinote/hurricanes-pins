@@ -180,7 +180,7 @@ export default function DesignPage() {
       {/* Header with logo */}
       <div className="px-5 pt-5 pb-2">
         <div className="flex items-center gap-3">
-          <Image src="/logo.svg" alt="SP" width={36} height={40} />
+          <span className="text-crimson text-2xl font-bold shrink-0" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
           <div className="flex-1">
             <h1 className="text-sp-white text-lg font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
               DESIGN YOUR PIN

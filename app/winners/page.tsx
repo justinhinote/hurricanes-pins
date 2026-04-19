@@ -15,7 +15,7 @@ export default async function WinnersPage() {
     <div className="min-h-screen px-6 py-12" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
-          <Image src="/logo.svg" alt="SP Hurricanes" width={70} height={70} className="mx-auto mb-4" />
+          <span className="text-crimson text-4xl font-bold block mb-4" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
           <h1 className="font-bold text-4xl text-sp-white leading-tight" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', textShadow: '2px 2px 0 #C41230' }}>
             WINNING PINS
           </h1>
