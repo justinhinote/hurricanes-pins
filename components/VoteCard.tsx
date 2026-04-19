@@ -334,12 +334,12 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
                   >
                     <span style={{ color: isSelected ? '#22c55e' : '#6b7280' }}>{icon}</span>
                     <span
-                      className="text-xs font-bold tracking-wide"
+                      className="text-sm font-bold tracking-wide"
                       style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', color: isSelected ? '#22c55e' : '#d1d5db' }}
                     >
                       {label}
                     </span>
-                    <span className="text-xs leading-snug" style={{ color: '#6b7280' }}>{desc}</span>
+                    <span className="text-sm leading-snug" style={{ color: '#6b7280' }}>{desc}</span>
                   </button>
                 );
               })}

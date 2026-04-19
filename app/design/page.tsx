@@ -431,7 +431,7 @@ export default function DesignPage() {
 
             {/* Tips */}
             <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-4">
-              <p className="text-gray-400 text-xs leading-relaxed">
+              <p className="text-gray-400 text-sm leading-relaxed">
                 <span className="text-sp-white font-bold">Tips:</span> These are team pins — we order 100+ of the winners. Bold shapes trade best. One special feature (spinner, dangler, glitter, glow) beats five stacked together. Team name and Cooperstown 2026 are added automatically.
               </p>
             </div>
