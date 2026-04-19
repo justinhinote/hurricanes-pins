@@ -7,12 +7,13 @@ function getOpenAI(): OpenAI {
   return _openai;
 }
 
-// Force no-text mode: AI generates artwork only, manufacturer handles text
-const TEXT_RULES = `
-CRITICAL: DO NOT include ANY text, words, letters, numbers, or typography in the image.
-No team names, no years, no initials, no labels — ZERO text of any kind.
-The design should be purely visual: shapes, colors, effects, composition only.
-Text will be added separately by the pin manufacturer.`;
+// Rules appended to every image generation prompt
+const IMAGE_RULES = `
+CRITICAL RULES:
+1. Show exactly ONE single pin design centered on a clean white background. NOT multiple pins. NOT a collection. ONE pin.
+2. DO NOT include ANY text, words, letters, numbers, or typography in the image. ZERO text of any kind. Text will be composited separately.
+3. The pin should fill most of the frame — large, detailed, centered.
+4. Show the pin as a physical enamel pin with metallic edges and a slight 3D quality.`;
 
 /**
  * Generate a pin image. Tries Google Imagen 3 first (much better at text),
@@ -20,7 +21,7 @@ Text will be added separately by the pin manufacturer.`;
  * Returns either a base64 data URL or a regular URL.
  */
 export async function generateImage(prompt: string): Promise<string> {
-  const fullPrompt = `${prompt}\n${TEXT_RULES}`;
+  const fullPrompt = `${prompt}\n${IMAGE_RULES}`;
 
   // Try Imagen 3 first (best text rendering)
   if (process.env.GOOGLE_API_KEY) {

@@ -22,9 +22,10 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { description, edit_of, photo } = body;
+  const { description, edit_of, photo, custom_text } = body;
   // edit_of: if provided, this is a free refinement (no attempt cost)
   // photo: optional base64 image data for vision-based design
+  // custom_text: optional text to overlay (player name, number, etc.)
 
   if (!description?.trim() && !photo) {
     return NextResponse.json({ error: 'Describe your pin idea or upload a photo' }, { status: 400 });
@@ -86,12 +87,12 @@ PIN DESIGN PRINCIPLES (optimized for real Cooperstown trading):
 - Size reference: 1.75-2.0 inch soft enamel pin. Design should read clearly at that size.
 - Trade value matters: would a kid from another state want this immediately?
 
-ABSOLUTELY NO TEXT IN THE IMAGE:
-- Do NOT include any words, letters, numbers, or typography in the prompt
-- No team names, no years, no initials — ZERO text
-- The design is purely visual: shapes, colors, effects, composition
-- Text will be added by the pin manufacturer separately
-- If the user asks for text, acknowledge it but explain the image will show the visual design only
+IMAGE RULES:
+- The prompt MUST describe exactly ONE single pin design, not multiple pins or a collection
+- Do NOT include any words, letters, numbers, or typography — ZERO text in the image
+- The design is purely visual: shapes, colors, effects, composition only
+- Text ("South Park Hurricanes", "Cooperstown 2026", etc.) will be composited onto the image separately
+- Describe the pin centered on a clean white background, filling most of the frame
 
 Return ONLY a JSON object: {"image_prompt": "...", "tags": ["...", "..."]}. No markdown.`,
     messages: [{
@@ -110,7 +111,7 @@ Create an image generation prompt. Specify: pin shape (vary it), enamel pin styl
     imagePrompt = parsed.image_prompt;
     tags = parsed.tags ?? [];
   } catch {
-    imagePrompt = `Trading pin design, enamel pin, shield shape, South Park Hurricanes, crimson red and black, text "SP" and "2026", ${conceptDescription}, professional sports trading pin, white background`;
+    imagePrompt = `Trading pin design, enamel pin, shield shape, South Park Hurricanes, crimson red and black, ${conceptDescription}, professional sports trading pin, single pin centered on white background, no text`;
     tags = ['hurricanes', 'baseball', 'cooperstown', 'crimson', 'enamel'];
   }
 
@@ -119,7 +120,7 @@ Create an image generation prompt. Specify: pin shape (vary it), enamel pin styl
 
   // Upload to Vercel Blob (permanent URL)
   const filename = `pins/${roundId}/draft-${playerId}-${Date.now()}.png`;
-  const { url, pathname } = await uploadImage(imageSource, filename);
+  const { url, pathname } = await uploadImage(imageSource, filename, custom_text ? { customLine: custom_text } : undefined);
 
   // Return as DRAFT — not saved to DB yet. Client must call /api/design/submit
   return NextResponse.json({

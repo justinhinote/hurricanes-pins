@@ -1,15 +1,21 @@
 import sharp from 'sharp';
 
+export interface TextOverlayOptions {
+  /** Optional custom line to show below "12U · SPYA" (e.g. player name, number, nickname) */
+  customLine?: string;
+}
+
+// Escape XML special characters for SVG
+function escapeXml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
 /**
  * Composite accurate text onto a pin design image using sharp + SVG.
- * Renders "SOUTH PARK HURRICANES" at top and "COOPERSTOWN 2026" at bottom
- * in a banner/ribbon style over the generated artwork.
- *
- * @param imageSource - base64 data URL or regular URL of the generated pin image
- * @returns Buffer of the composited PNG
+ * Always renders "SOUTH PARK HURRICANES" at top and "COOPERSTOWN 2026" at bottom.
+ * Optionally adds a custom text line (player name, number, etc.)
  */
-export async function addTextOverlay(imageSource: string): Promise<Buffer> {
-  // Get image buffer from source
+export async function addTextOverlay(imageSource: string, options?: TextOverlayOptions): Promise<Buffer> {
   let imageBuffer: Buffer;
   if (imageSource.startsWith('data:')) {
     const base64Data = imageSource.split(',')[1];
@@ -20,37 +26,41 @@ export async function addTextOverlay(imageSource: string): Promise<Buffer> {
     imageBuffer = Buffer.from(arrayBuffer);
   }
 
-  // Resize to 1024x1024 to ensure consistent overlay positioning
   const resized = await sharp(imageBuffer)
     .resize(1024, 1024, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
     .png()
     .toBuffer();
 
-  // Create SVG text overlay
-  // Banner style: dark semi-transparent ribbons with white text
+  const customLine = options?.customLine?.trim();
+  const topBannerHeight = customLine ? 115 : 95;
+
   const svgOverlay = `
     <svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
-      <!-- Top banner ribbon -->
-      <rect x="0" y="0" width="1024" height="95" rx="0" fill="rgba(13,0,0,0.82)"/>
-      <rect x="0" y="93" width="1024" height="3" fill="#C41230"/>
+      <!-- Top banner -->
+      <rect x="0" y="0" width="1024" height="${topBannerHeight}" fill="rgba(13,0,0,0.85)"/>
+      <rect x="0" y="${topBannerHeight - 2}" width="1024" height="3" fill="#C41230"/>
 
-      <!-- Top text: SOUTH PARK HURRICANES -->
-      <text x="512" y="40" text-anchor="middle"
+      <text x="512" y="38" text-anchor="middle"
             font-family="Impact, 'Arial Black', Helvetica, sans-serif"
-            font-size="38" font-weight="900" letter-spacing="3"
+            font-size="36" font-weight="900" letter-spacing="3"
             fill="#F5F0F0">SOUTH PARK HURRICANES</text>
 
-      <!-- Subtitle: 12U SPYA -->
-      <text x="512" y="72" text-anchor="middle"
+      <text x="512" y="68" text-anchor="middle"
             font-family="Impact, 'Arial Black', Helvetica, sans-serif"
-            font-size="22" font-weight="700" letter-spacing="6"
+            font-size="20" font-weight="700" letter-spacing="6"
             fill="#C41230">12U  ·  SPYA</text>
 
-      <!-- Bottom banner ribbon -->
-      <rect x="0" y="929" width="1024" height="95" rx="0" fill="rgba(13,0,0,0.82)"/>
+      ${customLine ? `
+      <text x="512" y="98" text-anchor="middle"
+            font-family="Impact, 'Arial Black', Helvetica, sans-serif"
+            font-size="22" font-weight="700" letter-spacing="2"
+            fill="#FF5500">${escapeXml(customLine.toUpperCase())}</text>
+      ` : ''}
+
+      <!-- Bottom banner -->
+      <rect x="0" y="929" width="1024" height="95" fill="rgba(13,0,0,0.85)"/>
       <rect x="0" y="929" width="1024" height="3" fill="#C41230"/>
 
-      <!-- Bottom text: COOPERSTOWN 2026 -->
       <text x="512" y="985" text-anchor="middle"
             font-family="Impact, 'Arial Black', Helvetica, sans-serif"
             font-size="42" font-weight="900" letter-spacing="5"
@@ -58,15 +68,8 @@ export async function addTextOverlay(imageSource: string): Promise<Buffer> {
     </svg>
   `;
 
-  // Composite the text overlay onto the image
   const result = await sharp(resized)
-    .composite([
-      {
-        input: Buffer.from(svgOverlay),
-        top: 0,
-        left: 0,
-      },
-    ])
+    .composite([{ input: Buffer.from(svgOverlay), top: 0, left: 0 }])
     .png()
     .toBuffer();
 

@@ -65,6 +65,7 @@ export default function DesignPage() {
   const [justSubmitted, setJustSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [photoData, setPhotoData] = useState<string | null>(null);
+  const [customText, setCustomText] = useState('');
   const textareaRef = useAutoResize(description);
   const refineRef = useAutoResize(description);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -88,6 +89,7 @@ export default function DesignPage() {
     const body: Record<string, unknown> = { description: prompt };
     if (isEdit && draft) body.edit_of = draft.concept_text;
     if (photoData) body.photo = photoData;
+    if (customText.trim()) body.custom_text = customText.trim();
 
     const res = await fetch('/api/design/generate', {
       method: 'POST',
@@ -310,84 +312,73 @@ export default function DesignPage() {
               </div>
             )}
 
-            {/* Design Brief */}
-            <div className="bg-charcoal/60 border border-gray-700 rounded-2xl p-4 mb-4">
-              <p className="text-fire text-sm font-bold uppercase tracking-widest mb-3">PIN DESIGN BRIEF</p>
-
-              <div className="mb-3">
-                <p className="text-crimson text-xs font-bold uppercase tracking-wide mb-1">Must include:</p>
-                <ul className="text-gray-300 text-sm space-y-0.5 pl-4 list-disc">
-                  <li>South Park Hurricanes identity (team colors, SP, or name)</li>
-                  <li>Cooperstown 2026 reference</li>
-                  <li>One baseball element (bat, ball, diamond, glove)</li>
-                  <li>One storm/hurricane element (wind, lightning, eye, clouds)</li>
-                </ul>
-              </div>
-
-              <div className="mb-3">
-                <p className="text-fire text-xs font-bold uppercase tracking-wide mb-1">Aim for:</p>
-                <ul className="text-gray-300 text-sm space-y-0.5 pl-4 list-disc">
-                  <li>One bold custom shape (not just a circle)</li>
-                  <li>6-8 words of text maximum</li>
-                  <li>One special feature (spinner, dangler, glitter, or glow)</li>
-                  <li>2-4 main colors plus metal outline</li>
-                </ul>
-              </div>
-
-              <div>
-                <p className="text-red-500 text-xs font-bold uppercase tracking-wide mb-1">Avoid:</p>
-                <ul className="text-gray-300 text-sm space-y-0.5 pl-4 list-disc">
-                  <li>Tiny scenes crammed together</li>
-                  <li>Long sentences or too many words</li>
-                  <li>Multiple effects stacked on each other</li>
-                  <li>Logos or characters you don&apos;t own</li>
-                </ul>
-              </div>
-            </div>
-
-            <p className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">CONCEPT DIRECTIONS</p>
-            <div className="grid grid-cols-4 gap-2 mb-5">
+            {/* Step 1: Pick a starting point */}
+            <p className="text-sp-white text-lg font-bold mb-2">Step 1: Pick a Starting Point</p>
+            <p className="text-gray-400 text-sm mb-3">Tap one to start. You can customize it after.</p>
+            <div className="grid grid-cols-2 gap-2.5 mb-6">
               {STYLE_TEMPLATES.map(t => (
                 <button
                   key={t.name}
                   onClick={() => handleStylePick(t)}
-                  className="flex flex-col items-center gap-1.5 bg-charcoal border border-gray-800 rounded-xl p-2.5 hover:border-crimson/50 active:scale-95 transition-all group"
+                  className="flex items-center gap-3 bg-charcoal border border-gray-800 rounded-xl p-3 hover:border-crimson/50 active:scale-95 transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all"
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-all"
                     style={{ background: `${t.color}15`, border: `1.5px solid ${t.color}35` }}>
                     <div className="w-4 h-4 rounded-full" style={{ background: t.color, boxShadow: `0 0 8px ${t.color}40` }}/>
                   </div>
-                  <span className="text-sp-white text-xs font-bold leading-tight text-center">{t.name}</span>
+                  <span className="text-sp-white text-sm font-bold leading-tight">{t.name}</span>
                 </button>
               ))}
             </div>
 
-            {/* Photo upload preview */}
-            {photoData && (
-              <div className="flex items-center gap-3 mb-3 bg-charcoal/60 border border-gray-800 rounded-xl p-3">
-                <div className="w-14 h-14 bg-black/40 rounded-lg overflow-hidden relative shrink-0">
-                  <Image src={`data:image/jpeg;base64,${photoData}`} alt="Your sketch" fill className="object-cover" sizes="56px"/>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sp-white text-sm font-bold">Photo attached</p>
-                  <p className="text-gray-400 text-sm">AI will use this as inspiration</p>
-                </div>
-                <button onClick={() => setPhotoData(null)} className="text-gray-400 hover:text-fire text-sm">Remove</button>
-              </div>
-            )}
+            {/* Step 2: Describe or customize */}
+            <p className="text-sp-white text-lg font-bold mb-2">Step 2: Describe Your Pin</p>
+            <p className="text-gray-400 text-sm mb-3">Or just type your own idea from scratch. Keep it simple — the AI handles the details.</p>
 
-            {/* Input area — auto-expanding textarea */}
-            <form onSubmit={handleFormSubmit} className="flex gap-2 items-end mb-2">
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                className="shrink-0 w-12 h-12 bg-charcoal border border-gray-700 rounded-full flex items-center justify-center hover:border-crimson/50 active:scale-90 transition-all"
-                title="Upload a photo or sketch"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                </svg>
-              </button>
+            <form onSubmit={handleFormSubmit} className="flex flex-col gap-3 mb-4">
+              <textarea
+                ref={textareaRef}
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Example: A baseball in the eye of a hurricane with lightning..."
+                rows={2}
+                className="w-full bg-charcoal border border-gray-700 text-sp-white text-base px-4 py-3 rounded-xl focus:outline-none focus:border-crimson placeholder-gray-500 resize-none overflow-hidden"
+              />
+
+              {/* Custom text field */}
+              <div>
+                <label className="text-gray-400 text-sm font-bold block mb-1">
+                  Add custom text to pin <span className="text-gray-500 font-normal">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={customText}
+                  onChange={e => setCustomText(e.target.value)}
+                  maxLength={30}
+                  placeholder="Your name, number, nickname..."
+                  className="w-full bg-charcoal border border-gray-700 text-fire text-base px-4 py-3 rounded-xl focus:outline-none focus:border-crimson placeholder-gray-500"
+                />
+                <p className="text-gray-500 text-xs mt-1">Shows on the pin banner. Team name + Cooperstown 2026 are already included.</p>
+              </div>
+
+              {/* Photo upload */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="flex items-center gap-2 bg-charcoal border border-gray-700 text-gray-400 px-4 py-3 rounded-xl hover:border-crimson/50 active:scale-95 transition-all text-sm"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  {photoData ? 'Photo attached' : 'Upload a sketch'}
+                </button>
+                {photoData && (
+                  <button type="button" onClick={() => setPhotoData(null)} className="text-gray-500 text-sm hover:text-fire">Remove</button>
+                )}
+              </div>
+
               <input
                 ref={fileRef}
                 type="file"
@@ -396,27 +387,25 @@ export default function DesignPage() {
                 className="hidden"
                 onChange={handlePhotoSelect}
               />
-              <textarea
-                ref={textareaRef}
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Describe your pin idea..."
-                rows={1}
-                className="flex-1 bg-charcoal border border-gray-700 text-sp-white text-base px-4 py-3 rounded-2xl focus:outline-none focus:border-crimson placeholder-gray-500 resize-none overflow-hidden"
-              />
+
+              {error && <p className="text-fire text-sm">{error}</p>}
+
               <button
                 type="submit"
                 disabled={!description.trim() && !photoData}
-                className="shrink-0 w-12 h-12 bg-crimson rounded-full flex items-center justify-center disabled:opacity-40 active:scale-90 transition-all"
+                className="w-full bg-crimson text-sp-white font-bold text-lg py-4 rounded-xl uppercase tracking-widest disabled:opacity-40 active:scale-95 transition-all"
+                style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(196,18,48,0.4)' }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
+                Generate My Pin
               </button>
             </form>
 
-            {error && <p className="text-fire text-sm mt-1">{error}</p>}
+            {/* Tips */}
+            <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-4">
+              <p className="text-gray-400 text-xs leading-relaxed">
+                <span className="text-sp-white font-bold">Tips:</span> Bold shapes trade best. One special feature (spinner, dangler, glitter, glow) is better than five. The AI will add team colors and a pin look automatically. Text is added perfectly by code — no misspellings.
+              </p>
+            </div>
           </div>
         )}
       </div>
