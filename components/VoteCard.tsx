@@ -185,7 +185,7 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
         <p className="mt-4 text-gray-400 text-base max-w-xs">
           Come back later to see if new designs have been added. Go design your own pin!
         </p>
-        <p className="mt-8 text-fire text-sm font-bold tracking-widest uppercase">
+        <p className="mt-8 text-fire text-base font-bold tracking-widest uppercase">
           South Park Hurricanes &mdash; Cooperstown 2026
         </p>
       </div>
@@ -212,7 +212,7 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
 
       {/* Instructions banner */}
       <div className="px-4 pt-4 pb-2">
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-base">
           <div className="flex items-center gap-1.5 text-red-500">
             <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"/></svg>
             <span className="font-bold uppercase tracking-wide">Swipe left = Trash</span>
@@ -310,7 +310,7 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
             >
               WHY CASH?
             </h2>
-            <p className="text-gray-400 text-sm -mt-2">Tap one or more, or skip</p>
+            <p className="text-gray-400 text-base -mt-2">Tap one or more, or skip</p>
 
             <div className="grid grid-cols-2 gap-3 w-full">
               {([
@@ -354,12 +354,12 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
                   >
                     <span style={{ color: isSelected ? '#22c55e' : '#6b7280' }}>{icon}</span>
                     <span
-                      className="text-sm font-bold tracking-wide"
+                      className="text-base font-bold tracking-wide"
                       style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', color: isSelected ? '#22c55e' : '#d1d5db' }}
                     >
                       {label}
                     </span>
-                    <span className="text-sm leading-snug" style={{ color: '#6b7280' }}>{desc}</span>
+                    <span className="text-base leading-snug" style={{ color: '#6b7280' }}>{desc}</span>
                   </button>
                 );
               })}

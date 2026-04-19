@@ -37,7 +37,7 @@ export default async function AdminHomePage() {
 
       {activeRound ? (
         <div className="bg-charcoal border border-crimson/30 rounded-xl p-5 mb-8">
-          <p className="text-fire text-sm font-bold uppercase tracking-widest mb-1">Active Round</p>
+          <p className="text-fire text-base font-bold uppercase tracking-widest mb-1">Active Round</p>
           <p className="text-sp-white text-2xl font-bold">{activeRound.name}</p>
           <div className="flex gap-6 mt-3 text-base text-gray-400">
             <span>{activeRound.vote_count} votes cast</span>
@@ -69,12 +69,12 @@ export default async function AdminHomePage() {
       </div>
 
       <div className="flex gap-3 mt-8">
-        <Link href="/" className="text-gray-400 text-sm hover:text-gray-300 transition-colors">Player view</Link>
+        <Link href="/" className="text-gray-400 text-base hover:text-gray-300 transition-colors">Player view</Link>
         <span className="text-gray-500">|</span>
-        <Link href="/winners" className="text-gray-400 text-sm hover:text-gray-300 transition-colors">Winners page</Link>
+        <Link href="/winners" className="text-gray-400 text-base hover:text-gray-300 transition-colors">Winners page</Link>
         <span className="text-gray-500">|</span>
         <form action="/api/auth/logout" method="POST" className="inline">
-          <button type="submit" className="text-gray-400 text-sm hover:text-fire transition-colors">Log out</button>
+          <button type="submit" className="text-gray-400 text-base hover:text-fire transition-colors">Log out</button>
         </form>
       </div>
     </div>

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Round, ConceptDraft } from '@/lib/types';
 import { PIN_TEXT_LIMITS, PIN_TEXT_DEFAULTS, sanitizeLine, type PinText } from '@/lib/pin-text';
+import { useAutoResize } from '@/lib/use-auto-resize';
 
 interface GeneratedConcept extends ConceptDraft {
   selected: boolean;
@@ -32,6 +33,8 @@ export default function GeneratePage() {
   function updateTextSlot(slot: keyof PinText, value: string) {
     setPinText(prev => ({ ...prev, [slot]: sanitizeLine(value, PIN_TEXT_LIMITS[slot]) }));
   }
+
+  const briefRef = useAutoResize(brief);
 
   useEffect(() => {
     fetch('/api/rounds').then(r => r.json()).then((data: Round[]) => {
@@ -123,7 +126,7 @@ export default function GeneratePage() {
       {/* Config panel */}
       <div className="bg-charcoal border border-gray-800 rounded-xl p-5 mb-6 flex flex-col gap-4">
         <div>
-          <label className="text-gray-400 text-sm uppercase font-bold tracking-wider mb-1.5 block">Round</label>
+          <label className="text-gray-400 text-base uppercase font-bold tracking-wider mb-1.5 block">Round</label>
           <select
             value={selectedRound}
             onChange={e => setSelectedRound(e.target.value ? parseInt(e.target.value) : '')}
@@ -136,17 +139,18 @@ export default function GeneratePage() {
           </select>
         </div>
         <div>
-          <label className="text-gray-400 text-sm uppercase font-bold tracking-wider mb-1.5 block">Design Brief</label>
+          <label className="text-gray-400 text-base uppercase font-bold tracking-wider mb-1.5 block">Design Brief</label>
           <textarea
+            ref={briefRef.setRef}
             value={brief}
             onChange={e => setBrief(e.target.value)}
             rows={4}
             placeholder="Describe what you want. Team colors (crimson + black), motifs (hurricane, SP logo), style (vintage enamel, bold modern), etc."
-            className="w-full bg-black/40 border border-gray-700 text-sp-white px-4 py-3 rounded-lg focus:outline-none focus:border-crimson transition-colors resize-none"
+            className="w-full bg-black/40 border border-gray-700 text-sp-white text-base px-4 py-3 rounded-lg focus:outline-none focus:border-crimson transition-colors resize-none overflow-hidden"
           />
         </div>
         <div>
-          <label className="text-gray-400 text-sm uppercase font-bold tracking-wider mb-1.5 block">Number of Concepts</label>
+          <label className="text-gray-400 text-base uppercase font-bold tracking-wider mb-1.5 block">Number of Concepts</label>
           <input
             type="number"
             min={1}
@@ -157,8 +161,8 @@ export default function GeneratePage() {
           />
         </div>
         <div>
-          <label className="text-gray-400 text-sm uppercase font-bold tracking-wider mb-1.5 block">Pin Text (applied to every pin in batch)</label>
-          <p className="text-gray-500 text-xs mb-2">All optional. Composited via SVG after image gen — AI never has to spell it.</p>
+          <label className="text-gray-400 text-base uppercase font-bold tracking-wider mb-1.5 block">Pin Text (applied to every pin in batch)</label>
+          <p className="text-gray-500 text-base mb-2">All optional. The AI bakes these strings into every pin in the batch — exact spelling preserved.</p>
           <div className="flex flex-col gap-2">
             {(['top', 'middle', 'bottom'] as const).map(slot => {
               const labels = { top: 'Top', middle: 'Middle', bottom: 'Bottom' };
@@ -166,7 +170,7 @@ export default function GeneratePage() {
               const max = PIN_TEXT_LIMITS[slot];
               return (
                 <div key={slot} className="flex items-center gap-2">
-                  <span className="text-gray-500 text-xs uppercase tracking-wider w-14 shrink-0">{labels[slot]}</span>
+                  <span className="text-gray-500 text-base uppercase tracking-wider w-14 shrink-0">{labels[slot]}</span>
                   <input
                     type="text"
                     value={value}
@@ -176,7 +180,7 @@ export default function GeneratePage() {
                     className="flex-1 bg-black/40 border border-gray-700 text-sp-white px-3 py-2 rounded-lg focus:outline-none focus:border-crimson placeholder-gray-600 text-base"
                     style={{ textTransform: 'uppercase' }}
                   />
-                  <span className={`text-xs w-10 text-right shrink-0 ${value.length >= max ? 'text-fire' : 'text-gray-500'}`}>{value.length}/{max}</span>
+                  <span className={`text-base w-10 text-right shrink-0 ${value.length >= max ? 'text-fire' : 'text-gray-500'}`}>{value.length}/{max}</span>
                 </div>
               );
             })}
@@ -201,14 +205,14 @@ export default function GeneratePage() {
             <button
               onClick={handleRenderImages}
               disabled={selectedCount === 0 || !selectedRound || renderingImages || generatingConcepts}
-              className="bg-fire text-black font-bold px-5 py-2 rounded-lg uppercase tracking-widest text-sm disabled:opacity-50 transition-all active:scale-95"
+              className="bg-fire text-black font-bold px-5 py-2 rounded-lg uppercase tracking-widest text-base disabled:opacity-50 transition-all active:scale-95"
             >
               {renderingImages
                 ? `Rendering... (${doneCount}/${selectedCount})`
                 : `Render ${selectedCount} Image${selectedCount !== 1 ? 's' : ''}`}
             </button>
           </div>
-          <p className="text-gray-400 text-sm -mt-2">Note: DALL-E generates 1 image per 12 seconds. {selectedCount} images will take ~{selectedCount * 12}s.</p>
+          <p className="text-gray-400 text-base -mt-2">Note: DALL-E generates 1 image per 12 seconds. {selectedCount} images will take ~{selectedCount * 12}s.</p>
 
           {concepts.map((concept, idx) => (
             <div
@@ -228,7 +232,7 @@ export default function GeneratePage() {
                   <p className="text-sp-white text-base leading-relaxed">{concept.concept}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {[...concept.tags.color_palette, ...concept.tags.style].slice(0, 5).map(tag => (
-                      <span key={tag} className="text-sm px-2 py-0.5 bg-black/40 text-gray-400 rounded border border-gray-700">{tag}</span>
+                      <span key={tag} className="text-base px-2 py-0.5 bg-black/40 text-gray-400 rounded border border-gray-700">{tag}</span>
                     ))}
                   </div>
                 </div>
@@ -244,7 +248,7 @@ export default function GeneratePage() {
                 )}
                 {concept.status === 'error' && (
                   <div className="shrink-0 w-16 h-16 bg-black/40 rounded-lg flex items-center justify-center">
-                    <span className="text-fire text-sm">Error</span>
+                    <span className="text-fire text-base">Error</span>
                   </div>
                 )}
               </div>

@@ -90,9 +90,9 @@ export default function ResultsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   {(pin as PinResult & { creator_name?: string }).creator_name && (
-                    <p className="text-fire text-sm font-bold mb-0.5">by {(pin as PinResult & { creator_name?: string }).creator_name}</p>
+                    <p className="text-fire text-base font-bold mb-0.5">by {(pin as PinResult & { creator_name?: string }).creator_name}</p>
                   )}
-                  <p className="text-gray-400 text-sm leading-relaxed truncate">{pin.concept_text}</p>
+                  <p className="text-gray-400 text-base leading-relaxed truncate">{pin.concept_text}</p>
                   <div className="flex items-center gap-3 mt-2">
                     {/* Vote bar */}
                     <div className="flex-1 h-2 bg-black/60 rounded-full overflow-hidden">
@@ -101,14 +101,14 @@ export default function ResultsPage() {
                         style={{ width: `${scorePercent}%` }}
                       />
                     </div>
-                    <span className="text-sp-white text-sm font-bold shrink-0">{scorePercent}%</span>
-                    <span className="text-gray-400 text-sm shrink-0">{pin.cash_count}C / {pin.trash_count}T</span>
+                    <span className="text-sp-white text-base font-bold shrink-0">{scorePercent}%</span>
+                    <span className="text-gray-400 text-base shrink-0">{pin.cash_count}C / {pin.trash_count}T</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <button
                     onClick={() => toggleWinner(pin)}
-                    className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${pin.is_winner ? 'bg-fire/20 border-fire/60 text-fire' : 'bg-transparent border-gray-700 text-gray-500 hover:border-crimson/50 hover:text-crimson'}`}
+                    className={`text-base font-bold px-3 py-1.5 rounded-lg border transition-all ${pin.is_winner ? 'bg-fire/20 border-fire/60 text-fire' : 'bg-transparent border-gray-700 text-gray-500 hover:border-crimson/50 hover:text-crimson'}`}
                   >
                     {pin.is_winner ? 'WINNER' : 'Pick'}
                   </button>
@@ -123,7 +123,7 @@ export default function ResultsPage() {
                       });
                       setResults(prev => prev.map(p => p.id === pin.id ? { ...p, award_category: cat } as PinResult : p));
                     }}
-                    className="text-xs bg-black/40 border border-gray-700 text-gray-400 rounded-lg px-2 py-1"
+                    className="text-base bg-black/40 border border-gray-700 text-gray-400 rounded-lg px-2 py-1"
                   >
                     <option value="">Category...</option>
                     <option value="best_trader">Best Trader</option>

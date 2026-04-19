@@ -85,7 +85,7 @@ export default function AnalyzePage() {
         <button
           onClick={handleAnalyze}
           disabled={!selectedRound || loading}
-          className="bg-crimson text-sp-white font-bold px-6 py-2 rounded-lg uppercase tracking-widest text-sm disabled:opacity-50 transition-all active:scale-95 whitespace-nowrap"
+          className="bg-crimson text-sp-white font-bold px-6 py-2 rounded-lg uppercase tracking-widest text-base disabled:opacity-50 transition-all active:scale-95 whitespace-nowrap"
         >
           {loading ? 'Analyzing...' : 'Run Analysis'}
         </button>
@@ -97,36 +97,36 @@ export default function AnalyzePage() {
         <div className="flex flex-col gap-6">
           {/* Narrative */}
           <div className="bg-charcoal border border-gray-800 rounded-xl p-5">
-            <h2 className="text-fire text-sm font-bold uppercase tracking-widest mb-3">What They Like</h2>
+            <h2 className="text-fire text-base font-bold uppercase tracking-widest mb-3">What They Like</h2>
             <p className="text-sp-white leading-relaxed">{result.analysis.narrative}</p>
           </div>
 
           {/* Element scores */}
           <div className="bg-charcoal border border-gray-800 rounded-xl p-5">
-            <h2 className="text-fire text-sm font-bold uppercase tracking-widest mb-4">Element Scores</h2>
+            <h2 className="text-fire text-base font-bold uppercase tracking-widest mb-4">Element Scores</h2>
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <p className="text-gray-400 text-sm uppercase font-bold mb-2">Highest Rated</p>
+                <p className="text-gray-400 text-base uppercase font-bold mb-2">Highest Rated</p>
                 <div className="flex flex-col gap-1.5">
                   {topElements.map(e => (
                     <div key={e.tag} className="flex items-center gap-2">
                       <div className="flex-1 h-1.5 bg-black/60 rounded-full overflow-hidden">
                         <div className="h-full bg-crimson rounded-full" style={{ width: `${(e.score + 1) * 50}%` }}/>
                       </div>
-                      <span className="text-sp-white text-sm font-mono shrink-0 w-20 truncate">{e.tag}</span>
+                      <span className="text-sp-white text-base font-mono shrink-0 w-20 truncate">{e.tag}</span>
                     </div>
                   ))}
                 </div>
               </div>
               <div>
-                <p className="text-gray-400 text-sm uppercase font-bold mb-2">Lowest Rated</p>
+                <p className="text-gray-400 text-base uppercase font-bold mb-2">Lowest Rated</p>
                 <div className="flex flex-col gap-1.5">
                   {bottomElements.map(e => (
                     <div key={e.tag} className="flex items-center gap-2">
                       <div className="flex-1 h-1.5 bg-black/60 rounded-full overflow-hidden">
                         <div className="h-full bg-gray-600 rounded-full" style={{ width: `${(1 - Math.abs(e.score)) * 50}%` }}/>
                       </div>
-                      <span className="text-gray-400 text-sm font-mono shrink-0 w-20 truncate">{e.tag}</span>
+                      <span className="text-gray-400 text-base font-mono shrink-0 w-20 truncate">{e.tag}</span>
                     </div>
                   ))}
                 </div>
@@ -136,20 +136,20 @@ export default function AnalyzePage() {
 
           {/* Claude's suggested prompts */}
           <div className="bg-charcoal border border-gray-800 rounded-xl p-5">
-            <h2 className="text-fire text-sm font-bold uppercase tracking-widest mb-1">Suggested Prompts for Next Round</h2>
-            <p className="text-gray-400 text-sm mb-4">Click Copy to paste into the Generate page brief</p>
+            <h2 className="text-fire text-base font-bold uppercase tracking-widest mb-1">Suggested Prompts for Next Round</h2>
+            <p className="text-gray-400 text-base mb-4">Click Copy to paste into the Generate page brief</p>
             <div className="flex flex-col gap-3">
               {result.analysis.suggested_prompts.map((p, idx) => (
                 <div key={idx} className="border border-gray-700 rounded-lg p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <p className="text-crimson text-sm font-bold uppercase tracking-wide mb-1">{p.theme}</p>
+                      <p className="text-crimson text-base font-bold uppercase tracking-wide mb-1">{p.theme}</p>
                       <p className="text-sp-white text-base leading-relaxed">{p.prompt_fragment}</p>
-                      <p className="text-gray-400 text-sm mt-1">{p.rationale}</p>
+                      <p className="text-gray-400 text-base mt-1">{p.rationale}</p>
                     </div>
                     <button
                       onClick={() => copyPrompt(p.prompt_fragment, idx)}
-                      className="shrink-0 text-sm px-3 py-1.5 bg-black/40 border border-gray-700 text-gray-400 hover:text-sp-white hover:border-crimson/50 rounded-lg transition-colors"
+                      className="shrink-0 text-base px-3 py-1.5 bg-black/40 border border-gray-700 text-gray-400 hover:text-sp-white hover:border-crimson/50 rounded-lg transition-colors"
                     >
                       {copied === idx ? 'Copied!' : 'Copy'}
                     </button>
@@ -161,7 +161,7 @@ export default function AnalyzePage() {
 
           <Link
             href="/admin/generate"
-            className="block text-center bg-crimson text-sp-white font-bold py-3 rounded-lg uppercase tracking-widest text-sm transition-all active:scale-95"
+            className="block text-center bg-crimson text-sp-white font-bold py-3 rounded-lg uppercase tracking-widest text-base transition-all active:scale-95"
           >
             Generate Round 2 with These Insights
           </Link>

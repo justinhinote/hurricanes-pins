@@ -89,21 +89,21 @@ export default async function HomePage() {
         <h2 className="text-sp-white font-bold text-2xl mb-5 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>HOW IT WORKS</h2>
         <div className="flex flex-col gap-4">
           <div className="flex gap-4 items-start">
-            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">1</span>
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-base font-bold">1</span>
             <div>
               <p className="text-sp-white font-bold text-base">Design Your Pin</p>
               <p className="text-gray-400 text-base leading-relaxed mt-0.5">Describe a pin another player would want immediately. Bold shape, clean look, one unforgettable feature.</p>
             </div>
           </div>
           <div className="flex gap-4 items-start">
-            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">2</span>
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-base font-bold">2</span>
             <div>
               <p className="text-sp-white font-bold text-base">Cash or Trash</p>
               <p className="text-gray-400 text-base leading-relaxed mt-0.5">Swipe through designs. CASH the ones you&apos;d trade for. TRASH the rest. Nobody sees scores.</p>
             </div>
           </div>
           <div className="flex gap-4 items-start">
-            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">3</span>
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-base font-bold">3</span>
             <div>
               <p className="text-sp-white font-bold text-base">Winners Get Made</p>
               <p className="text-gray-400 text-base leading-relaxed mt-0.5">Top designs get manufactured as real pins for Cooperstown.</p>
@@ -119,17 +119,17 @@ export default async function HomePage() {
             <div className="flex justify-around">
               <div className="text-center">
                 <p className="text-3xl text-sp-white font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_pins}</p>
-                <p className="text-gray-400 text-sm uppercase tracking-wider mt-1">Designs</p>
+                <p className="text-gray-400 text-base uppercase tracking-wider mt-1">Designs</p>
               </div>
               <div className="w-px bg-gray-800"/>
               <div className="text-center">
                 <p className="text-3xl text-fire font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_votes}</p>
-                <p className="text-gray-400 text-sm uppercase tracking-wider mt-1">Votes</p>
+                <p className="text-gray-400 text-base uppercase tracking-wider mt-1">Votes</p>
               </div>
               <div className="w-px bg-gray-800"/>
               <div className="text-center">
                 <p className="text-3xl text-sp-white font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>{stats.total_players}</p>
-                <p className="text-gray-400 text-sm uppercase tracking-wider mt-1">Voters</p>
+                <p className="text-gray-400 text-base uppercase tracking-wider mt-1">Voters</p>
               </div>
             </div>
           </div>
@@ -146,18 +146,18 @@ export default async function HomePage() {
             { n: '3', title: 'The Team-Insider Pin', desc: "The weird one. Only Hurricanes get it." },
           ].map(item => (
             <div key={item.n} className="bg-charcoal border border-gray-800 rounded-xl p-4 flex gap-3 items-center">
-              <span className="shrink-0 w-8 h-8 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">{item.n}</span>
+              <span className="shrink-0 w-8 h-8 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-base font-bold">{item.n}</span>
               <div>
                 <p className="text-sp-white font-bold text-base">{item.title}</p>
-                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                <p className="text-gray-400 text-base leading-relaxed">{item.desc}</p>
               </div>
             </div>
           ))}
           <div className="bg-charcoal border border-fire/30 rounded-xl p-4 flex gap-3 items-center">
-            <span className="shrink-0 w-8 h-8 rounded-full bg-fire/20 border border-fire/40 flex items-center justify-center text-fire text-sm font-bold">+</span>
+            <span className="shrink-0 w-8 h-8 rounded-full bg-fire/20 border border-fire/40 flex items-center justify-center text-fire text-base font-bold">+</span>
             <div>
               <p className="text-fire font-bold text-base">The Hurricanes Alert Drop</p>
-              <p className="text-gray-400 text-sm leading-relaxed">Mid-week surprise. Limited edition. Nobody sees it coming.</p>
+              <p className="text-gray-400 text-base leading-relaxed">Mid-week surprise. Limited edition. Nobody sees it coming.</p>
             </div>
           </div>
         </div>
@@ -167,7 +167,7 @@ export default async function HomePage() {
       {rankedPins.length > 0 && (
         <div className="px-6 max-w-lg mx-auto pb-10">
           <h2 className="text-sp-white font-bold text-2xl mb-1 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>TOP DESIGNS</h2>
-          <p className="text-gray-400 text-sm text-center mb-5 uppercase tracking-wider">Ranked by popular vote</p>
+          <p className="text-gray-400 text-base text-center mb-5 uppercase tracking-wider">Ranked by popular vote</p>
           <div className="flex flex-col gap-2.5">
             {rankedPins.map((pin, i) => {
               const isTop3 = i < 3;
@@ -175,13 +175,13 @@ export default async function HomePage() {
               const ringColors = ['ring-yellow-500/30', 'ring-gray-400/30', 'ring-orange-500/30'];
               return (
                 <div key={pin.id} className={`flex items-center gap-3 rounded-xl p-3 ${isTop3 ? 'bg-charcoal border border-gray-800' : 'bg-charcoal/40'}`}>
-                  <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border ${isTop3 ? rankColors[i] : 'text-gray-400 border-gray-800 bg-black/30'}`}>{i + 1}</div>
+                  <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-base border ${isTop3 ? rankColors[i] : 'text-gray-400 border-gray-800 bg-black/30'}`}>{i + 1}</div>
                   <div className={`shrink-0 w-14 h-14 relative rounded-lg overflow-hidden bg-black/40 ${isTop3 ? `ring-2 ${ringColors[i]}` : ''}`}>
                     <Image src={pin.image_url} alt={`#${i + 1}`} fill className="object-contain" sizes="56px" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sp-white text-base truncate">{displayConcept(pin.concept_text, 90)}</p>
-                    {pin.creator_name && <p className="text-gray-400 text-sm mt-0.5 break-words">by {pin.creator_name}</p>}
+                    {pin.creator_name && <p className="text-gray-400 text-base mt-0.5 break-words">by {pin.creator_name}</p>}
                   </div>
                 </div>
               );
@@ -192,11 +192,11 @@ export default async function HomePage() {
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <Link href={hasSession ? '/vote' : '/join'} className="flex-1 text-center bg-crimson text-sp-white font-bold px-6 py-4 rounded-xl active:scale-95 transition-all" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(196,18,48,0.4)' }}>
               <span className="text-lg uppercase tracking-widest">Vote Now</span>
-              <span className="block text-sm text-sp-white/60 uppercase tracking-wider mt-0.5 font-normal">Judge the Designs</span>
+              <span className="block text-base text-sp-white/60 uppercase tracking-wider mt-0.5 font-normal">Judge the Designs</span>
             </Link>
             <Link href={hasSession ? '/design' : '/join'} className="flex-1 text-center bg-charcoal border-2 border-fire/40 text-sp-white font-bold px-6 py-4 rounded-xl active:scale-95 transition-all hover:border-fire/70" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
               <span className="text-lg uppercase tracking-widest text-fire">Design</span>
-              <span className="block text-sm text-gray-400 uppercase tracking-wider mt-0.5 font-normal">Think You Can Do Better?</span>
+              <span className="block text-base text-gray-400 uppercase tracking-wider mt-0.5 font-normal">Think You Can Do Better?</span>
             </Link>
           </div>
         </div>
@@ -205,8 +205,8 @@ export default async function HomePage() {
       {/* ===== FOOTER ===== */}
       <div className="px-6 py-8 text-center border-t border-gray-900">
         <span className="text-gray-500 text-lg font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
-        <p className="text-gray-500 text-sm">South Park Hurricanes &bull; SPYA Baseball &bull; Cooperstown 2026</p>
-        <Link href="/admin/login" className="text-gray-500 text-sm hover:text-gray-400 transition-colors mt-2 inline-block">Admin</Link>
+        <p className="text-gray-500 text-base">South Park Hurricanes &bull; SPYA Baseball &bull; Cooperstown 2026</p>
+        <Link href="/admin/login" className="text-gray-500 text-base hover:text-gray-400 transition-colors mt-2 inline-block">Admin</Link>
       </div>
     </div>
   );

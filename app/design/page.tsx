@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import PlayerNav from '@/components/PlayerNav';
 import { PIN_TEXT_LIMITS, PIN_TEXT_DEFAULTS, sanitizeLine, type PinText } from '@/lib/pin-text';
+import { useAutoResize } from '@/lib/use-auto-resize';
 
 interface DraftPin {
   image_url: string;
@@ -44,25 +45,6 @@ const REFINE_CHIPS = [
   'Shield shape instead',
   'Add a Cooperstown charm',
 ];
-
-// Auto-expanding textarea hook. Resizes whenever the value changes AND
-// whenever the textarea attaches to the DOM (so a textarea that mounts
-// already populated still grows to fit its content).
-function useAutoResize(value: string) {
-  const ref = useRef<HTMLTextAreaElement | null>(null);
-  const fit = (el: HTMLTextAreaElement) => {
-    el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, 600)}px`;
-  };
-  const setRef = useCallback((node: HTMLTextAreaElement | null) => {
-    ref.current = node;
-    if (node) fit(node);
-  }, []);
-  useEffect(() => {
-    if (ref.current) fit(ref.current);
-  }, [value]);
-  return { setRef, ref };
-}
 
 export default function DesignPage() {
   const [description, setDescription] = useState('');
@@ -210,10 +192,10 @@ export default function DesignPage() {
             <h1 className="text-sp-white text-2xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
               DESIGN YOUR PIN
             </h1>
-            <p className="text-gray-400 text-sm">Best designs get made into real trading pins</p>
+            <p className="text-gray-400 text-base">Best designs get made into real trading pins</p>
           </div>
           {submittedPins.length > 0 && (
-            <span className="text-fire text-sm font-bold">{submittedPins.length} submitted</span>
+            <span className="text-fire text-base font-bold">{submittedPins.length} submitted</span>
           )}
         </div>
       </div>
@@ -252,15 +234,15 @@ export default function DesignPage() {
 
             {/* Refine section */}
             <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-4 max-w-sm mx-auto">
-              <p className="text-fire text-sm font-bold uppercase tracking-wide mb-1">Refine This Design</p>
-              <p className="text-gray-400 text-sm mb-3">Describe what to change</p>
+              <p className="text-fire text-base font-bold uppercase tracking-wide mb-1">Refine This Design</p>
+              <p className="text-gray-400 text-base mb-3">Describe what to change</p>
 
               <div className="flex flex-wrap gap-2 mb-3">
                 {REFINE_CHIPS.slice(0, 6).map(chip => (
                   <button
                     key={chip}
                     onClick={() => handleRefine(chip)}
-                    className="text-sm px-3 py-1.5 bg-black/40 border border-gray-700 text-gray-300 rounded-full hover:border-crimson/50 hover:text-sp-white active:scale-95 transition-all"
+                    className="text-base px-3 py-1.5 bg-black/40 border border-gray-700 text-gray-300 rounded-full hover:border-crimson/50 hover:text-sp-white active:scale-95 transition-all"
                   >
                     {chip}
                   </button>
@@ -318,7 +300,7 @@ export default function DesignPage() {
               <div className="w-14 h-14 border-3 border-fire border-t-transparent rounded-full animate-spin"/>
               <div className="text-center">
                 <p className="text-sp-white text-lg font-bold">Creating your pin...</p>
-                <p className="text-gray-400 text-sm mt-1">AI is drawing your design (~30s)</p>
+                <p className="text-gray-400 text-base mt-1">AI is drawing your design (~30s)</p>
               </div>
             </div>
           </div>
@@ -330,7 +312,7 @@ export default function DesignPage() {
             {/* Submitted pins gallery */}
             {submittedPins.length > 0 && (
               <div className="mb-5">
-                <p className="text-fire text-sm font-bold uppercase tracking-wide mb-2">Your Submissions ({submittedPins.length})</p>
+                <p className="text-fire text-base font-bold uppercase tracking-wide mb-2">Your Submissions ({submittedPins.length})</p>
                 <div className="flex gap-3 overflow-x-auto pb-2">
                   {submittedPins.map(pin => (
                     <div key={pin.id} className="shrink-0 w-24">
@@ -351,7 +333,7 @@ export default function DesignPage() {
 
             {/* Pin text fields */}
             <p className="text-sp-white text-lg font-bold mb-1">Pin Text</p>
-            <p className="text-gray-400 text-sm mb-3">All optional. Leave blank for a text-free pin. We add the text after — the AI never has to spell it.</p>
+            <p className="text-gray-400 text-base mb-3">All optional. Leave blank for a text-free pin. The AI bakes whatever you type into the design itself.</p>
             <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-3 mb-5 flex flex-col gap-2.5">
               {(['top', 'middle', 'bottom'] as const).map(slot => {
                 const labels = { top: 'Top', middle: 'Middle', bottom: 'Bottom' };
@@ -360,8 +342,8 @@ export default function DesignPage() {
                 return (
                   <div key={slot}>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-gray-400 text-sm font-bold uppercase tracking-wider">{labels[slot]}</label>
-                      <span className={`text-xs ${value.length >= max ? 'text-fire' : 'text-gray-500'}`}>{value.length}/{max}</span>
+                      <label className="text-gray-400 text-base font-bold uppercase tracking-wider">{labels[slot]}</label>
+                      <span className={`text-base ${value.length >= max ? 'text-fire' : 'text-gray-500'}`}>{value.length}/{max}</span>
                     </div>
                     <input
                       type="text"
@@ -379,7 +361,7 @@ export default function DesignPage() {
 
             {/* Describe your pin */}
             <p className="text-sp-white text-lg font-bold mb-2">Describe Your Pin</p>
-            <p className="text-gray-400 text-sm mb-3">Type your idea. Keep it simple — the AI handles the details.</p>
+            <p className="text-gray-400 text-base mb-3">Type your idea. Keep it simple — the AI handles the details.</p>
 
             <form onSubmit={handleFormSubmit} className="flex flex-col gap-3 mb-4">
               <textarea
@@ -397,7 +379,7 @@ export default function DesignPage() {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 bg-charcoal border border-gray-700 text-gray-400 px-4 py-3 rounded-xl hover:border-crimson/50 active:scale-95 transition-all text-sm"
+                  className="flex items-center gap-2 bg-charcoal border border-gray-700 text-gray-400 px-4 py-3 rounded-xl hover:border-crimson/50 active:scale-95 transition-all text-base"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
@@ -405,7 +387,7 @@ export default function DesignPage() {
                   {photoData ? 'Photo attached' : 'Upload a photo or design file for context'}
                 </button>
                 {photoData && (
-                  <button type="button" onClick={() => setPhotoData(null)} className="text-gray-500 text-sm hover:text-fire">Remove</button>
+                  <button type="button" onClick={() => setPhotoData(null)} className="text-gray-500 text-base hover:text-fire">Remove</button>
                 )}
               </div>
 
@@ -418,7 +400,7 @@ export default function DesignPage() {
                 onChange={handlePhotoSelect}
               />
 
-              {error && <p className="text-fire text-sm">{error}</p>}
+              {error && <p className="text-fire text-base">{error}</p>}
 
               <button
                 type="submit"
@@ -432,7 +414,7 @@ export default function DesignPage() {
 
             {/* Tips */}
             <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-12">
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-gray-400 text-base leading-relaxed">
                 <span className="text-sp-white font-bold">Tip:</span> Bold shape, one wow feature (spinner, dangler, glitter, or glow). Pick one — five stacked together looks busy.
               </p>
             </div>
@@ -441,7 +423,7 @@ export default function DesignPage() {
                 primary path is the text fields + describe + generate. */}
             <div className="mb-3">
               <p className="text-sp-white text-base font-bold">Not that creative? Don&apos;t worry about it...</p>
-              <p className="text-gray-400 text-sm mt-1 leading-relaxed">Pick one of the templates below and it will prefill an AI-powered pin description for you to play with or adjust.</p>
+              <p className="text-gray-400 text-base mt-1 leading-relaxed">Pick one of the templates below and it will prefill an AI-powered pin description for you to play with or adjust.</p>
             </div>
 
             {/* Award categories as design prompts */}
@@ -463,8 +445,8 @@ export default function DesignPage() {
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={cat.icon}/></svg>
                   </div>
                   <div>
-                    <p className="text-sp-white text-sm font-bold">{cat.name}</p>
-                    <p className="text-gray-500 text-sm mt-0.5 leading-relaxed break-words">{cat.prompt}</p>
+                    <p className="text-sp-white text-base font-bold">{cat.name}</p>
+                    <p className="text-gray-500 text-base mt-0.5 leading-relaxed break-words">{cat.prompt}</p>
                   </div>
                 </button>
               ))}
@@ -482,7 +464,7 @@ export default function DesignPage() {
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-all" style={{ background: `${t.color}15`, border: `1.5px solid ${t.color}35` }}>
                     <div className="w-3 h-3 rounded-full" style={{ background: t.color }}/>
                   </div>
-                  <span className="text-sp-white text-sm font-bold leading-tight">{t.name}</span>
+                  <span className="text-sp-white text-base font-bold leading-tight">{t.name}</span>
                 </button>
               ))}
             </div>

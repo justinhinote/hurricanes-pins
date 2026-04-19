@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import Link from 'next/link';
 import type { Round } from '@/lib/types';
+import { useAutoResize } from '@/lib/use-auto-resize';
 
 const STATUS_COLORS: Record<string, string> = {
   active: 'text-fire border-fire/50 bg-fire/10',
@@ -45,6 +46,8 @@ export default function RoundsPage() {
     setActivating(null);
   }
 
+  const briefRef = useAutoResize(brief);
+
   return (
     <div className="max-w-2xl mx-auto px-6 py-10">
       <div className="flex items-center gap-3 mb-8">
@@ -66,11 +69,12 @@ export default function RoundsPage() {
             className="bg-black/40 border border-gray-700 text-sp-white px-4 py-3 rounded-lg focus:outline-none focus:border-crimson transition-colors"
           />
           <textarea
+            ref={briefRef.setRef}
             value={brief}
             onChange={e => setBrief(e.target.value)}
             placeholder="Design brief (optional — used for AI generation)"
             rows={3}
-            className="bg-black/40 border border-gray-700 text-sp-white px-4 py-3 rounded-lg focus:outline-none focus:border-crimson transition-colors resize-none"
+            className="bg-black/40 border border-gray-700 text-sp-white text-base px-4 py-3 rounded-lg focus:outline-none focus:border-crimson transition-colors resize-none overflow-hidden"
           />
           <button
             type="submit"
@@ -88,20 +92,20 @@ export default function RoundsPage() {
           <div key={round.id} className="bg-charcoal border border-gray-800 rounded-xl p-4 flex items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className={`text-xs font-bold px-2 py-0.5 rounded border uppercase tracking-wide ${STATUS_COLORS[round.status]}`}>
+                <span className={`text-base font-bold px-2 py-0.5 rounded border uppercase tracking-wide ${STATUS_COLORS[round.status]}`}>
                   {round.status}
                 </span>
                 <span className="text-sp-white font-bold truncate">{round.name}</span>
               </div>
               {round.brief && (
-                <p className="text-gray-400 text-sm truncate">{round.brief}</p>
+                <p className="text-gray-400 text-base truncate">{round.brief}</p>
               )}
             </div>
             {round.status !== 'active' && (
               <button
                 onClick={() => activateRound(round.id)}
                 disabled={activating === round.id}
-                className="shrink-0 text-sm px-4 py-2 bg-crimson/20 border border-crimson/40 text-crimson rounded-lg hover:bg-crimson/30 transition-colors disabled:opacity-50"
+                className="shrink-0 text-base px-4 py-2 bg-crimson/20 border border-crimson/40 text-crimson rounded-lg hover:bg-crimson/30 transition-colors disabled:opacity-50"
               >
                 {activating === round.id ? '...' : 'Activate'}
               </button>

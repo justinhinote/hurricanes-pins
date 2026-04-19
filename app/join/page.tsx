@@ -65,7 +65,7 @@ export default function JoinPage() {
             <p className="mt-3 text-fire text-base font-bold tracking-widest uppercase">
               Cooperstown 2026
             </p>
-            <p className="mt-1 text-gray-400 text-sm text-center">
+            <p className="mt-1 text-gray-400 text-base text-center">
               Design a pin &bull; Vote on everyone&apos;s &bull; Best ones get made
             </p>
           </div>
@@ -103,7 +103,7 @@ export default function JoinPage() {
           </button>
         </form>
 
-        <p className="text-gray-400 text-sm text-center">
+        <p className="text-gray-400 text-base text-center">
           Vote on pin designs. No scores shown until the end.
         </p>
       </div>
