@@ -22,7 +22,7 @@ const CATEGORIES: Record<string, { title: string; description: string }> = {
     description: 'Hand-selected by the coaching staff. The design that represents what this team is about.',
   },
   secret_drop: {
-    title: 'Storm Alert Drop',
+    title: 'Hurricanes Alert Drop',
     description: 'Limited edition mid-week surprise. Special finish, small run. The pin nobody sees coming.',
   },
 };
@@ -141,7 +141,7 @@ export default async function WinnersPage() {
             </div>
             <div className="flex gap-3 mt-1 pt-3 border-t border-gray-800">
               <span className="text-fire font-bold shrink-0">+</span>
-              <p className="text-gray-300"><span className="text-fire font-bold">Storm Alert Drop</span> — Mid-week limited edition surprise. You will not see it coming.</p>
+              <p className="text-gray-300"><span className="text-fire font-bold">Hurricanes Alert Drop</span> — Mid-week limited edition surprise. You will not see it coming.</p>
             </div>
           </div>
         </div>

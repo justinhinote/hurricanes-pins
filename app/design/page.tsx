@@ -21,14 +21,14 @@ interface SubmittedPin {
 }
 
 const STYLE_TEMPLATES = [
-  { name: 'Hurricane Baseball', prompt: 'A baseball at the eye of a hurricane storm with red-and-black lightning, custom cyclone-shaped pin outline', color: '#FF5500' },
-  { name: 'Storm Flag', prompt: 'Hurricane warning pennant flag shape with a dangling Cooperstown 2026 charm, team colors', color: '#C41230' },
-  { name: 'Cooperstown Arrival', prompt: 'Dreams Park entrance arch under a storm sky with South Park Hurricanes wordmark, badge-style pin', color: '#4488FF' },
-  { name: 'Radar Pin', prompt: 'Weather radar screen showing a glowing storm cell over a baseball diamond, circular pin with glow effect', color: '#22FF66' },
-  { name: 'Spinner Pin', prompt: 'A spinning hurricane eye that could rotate as a moving spinner pin, the SP logo in the center', color: '#00BBFF' },
-  { name: 'Fire & Lightning', prompt: 'A flaming baseball with lightning bolts and SP diamond, star-shaped pin with pointed edges', color: '#FF8800' },
-  { name: 'Oversized Wild', prompt: 'A big oversized unusually shaped pin with a 3D hurricane tornado, dangling baseball charms', color: '#AA44FF' },
-  { name: 'Series Set', prompt: 'A collectible pin in a series of 3, SP diamond shield with unique pattern background', color: '#FFD700' },
+  { name: 'Hurricanes Baseball', prompt: 'A baseball surrounded by Hurricanes wind and red-and-black lightning, custom cyclone-shaped pin for the South Park Hurricanes team', color: '#FF5500' },
+  { name: 'Hurricanes Flag', prompt: 'Hurricanes pennant flag shape with a dangling Cooperstown 2026 charm, South Park Hurricanes team colors', color: '#C41230' },
+  { name: 'Cooperstown Arrival', prompt: 'Dreams Park entrance arch with the South Park Hurricanes arriving, badge-style team pin', color: '#4488FF' },
+  { name: 'Radar Pin', prompt: 'Weather radar screen showing the Hurricanes approaching over a baseball diamond, team circular pin with glow effect', color: '#22FF66' },
+  { name: 'Spinner Pin', prompt: 'A spinning Hurricanes eye that rotates as a moving spinner pin, the SP Hurricanes logo in the center', color: '#00BBFF' },
+  { name: 'Fire & Lightning', prompt: 'A flaming baseball with lightning bolts and SP Hurricanes diamond, star-shaped team pin', color: '#FF8800' },
+  { name: 'Oversized Wild', prompt: 'A big oversized unusually shaped pin with a 3D Hurricanes tornado, dangling baseball charms, team pin', color: '#AA44FF' },
+  { name: 'Series Set', prompt: 'A collectible team pin in a series of 3, SP Hurricanes diamond shield with unique pattern background', color: '#FFD700' },
 ];
 
 const REFINE_CHIPS = [
@@ -65,7 +65,6 @@ export default function DesignPage() {
   const [justSubmitted, setJustSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [photoData, setPhotoData] = useState<string | null>(null);
-  const [customText, setCustomText] = useState('');
   const textareaRef = useAutoResize(description);
   const refineRef = useAutoResize(description);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -89,7 +88,6 @@ export default function DesignPage() {
     const body: Record<string, unknown> = { description: prompt };
     if (isEdit && draft) body.edit_of = draft.concept_text;
     if (photoData) body.photo = photoData;
-    if (customText.trim()) body.custom_text = customText.trim();
 
     const res = await fetch('/api/design/generate', {
       method: 'POST',
@@ -314,7 +312,7 @@ export default function DesignPage() {
 
             {/* Quick brief — kid-friendly */}
             <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-4 mb-5">
-              <p className="text-sp-white text-base leading-relaxed">Design a pin kids from other teams would trade for. Include something baseball, something storm. One cool shape, one special feature. That&apos;s it.</p>
+              <p className="text-sp-white text-base leading-relaxed">Design a pin kids from other teams would trade for. Think Hurricanes + baseball. One bold shape, one cool feature. That&apos;s it.</p>
             </div>
 
             {/* Award categories as design prompts */}
@@ -371,26 +369,10 @@ export default function DesignPage() {
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Example: A baseball in the eye of a hurricane with lightning..."
+                placeholder="Example: A baseball in the eye of the Hurricanes with lightning..."
                 rows={2}
                 className="w-full bg-charcoal border border-gray-700 text-sp-white text-base px-4 py-3 rounded-xl focus:outline-none focus:border-crimson placeholder-gray-500 resize-none overflow-hidden"
               />
-
-              {/* Custom text field */}
-              <div>
-                <label className="text-gray-400 text-sm font-bold block mb-1">
-                  Add custom text to pin <span className="text-gray-500 font-normal">(optional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={customText}
-                  onChange={e => setCustomText(e.target.value)}
-                  maxLength={30}
-                  placeholder="Your name, number, nickname..."
-                  className="w-full bg-charcoal border border-gray-700 text-fire text-base px-4 py-3 rounded-xl focus:outline-none focus:border-crimson placeholder-gray-500"
-                />
-                <p className="text-gray-500 text-xs mt-1">Shows on the pin banner. Team name + Cooperstown 2026 are already included.</p>
-              </div>
 
               {/* Photo upload */}
               <div className="flex gap-2">
@@ -433,7 +415,7 @@ export default function DesignPage() {
             {/* Tips */}
             <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-4">
               <p className="text-gray-400 text-xs leading-relaxed">
-                <span className="text-sp-white font-bold">Tips:</span> Bold shapes trade best. One special feature (spinner, dangler, glitter, glow) is better than five. The AI will add team colors and a pin look automatically. Text is added perfectly by code — no misspellings.
+                <span className="text-sp-white font-bold">Tips:</span> These are team pins — we order 100+ of the winners. Bold shapes trade best. One special feature (spinner, dangler, glitter, glow) beats five stacked together. Team name and Cooperstown 2026 are added automatically.
               </p>
             </div>
           </div>

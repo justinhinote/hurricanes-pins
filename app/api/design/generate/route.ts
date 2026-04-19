@@ -81,7 +81,7 @@ The team: South Park Hurricanes (SPYA), 12U travel baseball, Cooperstown 2026.
 Team colors: crimson red (#C41230) and black. Logo: SP diamond shield.
 
 PIN DESIGN PRINCIPLES (optimized for real Cooperstown trading):
-- Strong silhouette first: one bold custom shape (hurricane swirl, storm flag, home plate, baseball with motion). NOT a standard circle.
+- Strong silhouette first: one bold custom shape (Hurricanes swirl, pennant flag, home plate, baseball with motion). NOT a standard circle.
 - One "wow" feature only: spinner OR dangler OR glitter OR glow. Not multiple effects stacked.
 - High contrast: bold color blocking with raised metal lines. Red, black, silver, white, lightning accents. No subtle gradients.
 - Size reference: 1.75-2.0 inch soft enamel pin. Design should read clearly at that size.

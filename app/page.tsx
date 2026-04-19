@@ -155,7 +155,7 @@ export default async function HomePage() {
           <div className="bg-charcoal border border-fire/30 rounded-xl p-4 flex gap-3 items-center">
             <span className="shrink-0 w-8 h-8 rounded-full bg-fire/20 border border-fire/40 flex items-center justify-center text-fire text-sm font-bold">+</span>
             <div>
-              <p className="text-fire font-bold text-base">The Storm Alert Drop</p>
+              <p className="text-fire font-bold text-base">The Hurricanes Alert Drop</p>
               <p className="text-gray-400 text-sm">Mid-week surprise. Limited edition. Nobody sees it coming.</p>
             </div>
           </div>

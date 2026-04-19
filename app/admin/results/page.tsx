@@ -130,7 +130,7 @@ export default function ResultsPage() {
                     <option value="most_creative">Most Creative</option>
                     <option value="cooperstown_spirit">Cooperstown Spirit</option>
                     <option value="coaches_pick">Coach Pick</option>
-                    <option value="secret_drop">Storm Drop</option>
+                    <option value="secret_drop">Hurricanes Drop</option>
                   </select>
                 </div>
               </div>

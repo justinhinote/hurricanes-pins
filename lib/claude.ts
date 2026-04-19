@@ -37,7 +37,7 @@ Return a JSON array where each element has exactly these fields:
   - color_palette (e.g. ["crimson", "black", "gold"])
   - mascot (e.g. ["hurricane", "baseball", "bat"])
   - style (e.g. ["vintage", "enamel", "bold"])
-  - theme (e.g. ["cooperstown", "championship", "storm"])
+  - theme (e.g. ["cooperstown", "championship", "hurricanes"])
   - composition (e.g. ["shield", "pennant", "star_burst", "diamond"])
 
 Rules:
