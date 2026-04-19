@@ -424,17 +424,17 @@ export default function DesignPage() {
             </form>
 
             {/* Tips */}
-            <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-6">
+            <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-12">
               <p className="text-gray-400 text-sm leading-relaxed">
                 <span className="text-sp-white font-bold">Tip:</span> Bold shape, one wow feature (spinner, dangler, glitter, or glow). Pick one — five stacked together looks busy.
               </p>
             </div>
 
-            {/* Inspiration helpers — appear AFTER the design dialogue so the
+            {/* Template helpers — appear AFTER the design dialogue so the
                 primary path is the text fields + describe + generate. */}
-            <div className="mb-2">
-              <p className="text-gray-400 text-sm font-bold uppercase tracking-wider">Need Inspiration?</p>
-              <p className="text-gray-500 text-sm">Tap any of these to fill in the description above, then tweak it.</p>
+            <div className="mb-3">
+              <p className="text-sp-white text-base font-bold">Not that creative? Don&apos;t worry about it...</p>
+              <p className="text-gray-400 text-sm mt-1 leading-relaxed">Pick one of the templates below and it will prefill an AI-powered pin description for you to play with or adjust.</p>
             </div>
 
             {/* Award categories as design prompts */}
