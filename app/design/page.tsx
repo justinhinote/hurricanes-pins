@@ -342,50 +342,6 @@ export default function DesignPage() {
               <p className="text-sp-white text-base leading-relaxed">Design a pin kids from other teams would trade for. Think Hurricanes + baseball. One bold shape, one cool feature. That&apos;s it.</p>
             </div>
 
-            {/* Award categories as design prompts */}
-            <p className="text-sp-white text-lg font-bold mb-2">Design for an Award</p>
-            <p className="text-gray-400 text-sm mb-3">Tap a category to design for it, or scroll down to freestyle.</p>
-            <div className="grid grid-cols-1 gap-2 mb-5">
-              {[
-                { name: 'Best Trader', prompt: 'Design the pin everyone at Cooperstown fights over. Bold shape, clean look, impossible to pass up in a trade.', color: '#FFD700', icon: 'M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3' },
-                { name: 'Most Creative', prompt: 'Make something nobody has ever seen on a pin before. Surprise everyone. Go weird.', color: '#FF5500', icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z' },
-                { name: 'Cooperstown Spirit', prompt: 'Capture the Cooperstown Dreams Park experience. The trip, the fields, the feeling of being there.', color: '#4488FF', icon: 'M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4' },
-                { name: "Coach's Pick", prompt: 'Design the pin the coaches would want on their lanyard. Clean, tough, represents the team.', color: '#C41230', icon: 'M9 2h6l3 7H6L9 2zM4 9h16v13H4z' },
-                { name: 'Secret Drop', prompt: 'Design the mystery limited-edition surprise pin. Something rare, something special, something nobody expects.', color: '#22FF66', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8' },
-              ].map(cat => (
-                <button
-                  key={cat.name}
-                  onClick={() => { setDescription(cat.prompt); textareaRef.current?.focus(); }}
-                  className="flex items-center gap-3 bg-charcoal border border-gray-800 rounded-xl p-3.5 hover:border-crimson/50 active:scale-[0.98] transition-all text-left group"
-                >
-                  <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all" style={{ background: `${cat.color}15`, border: `1.5px solid ${cat.color}40` }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={cat.icon}/></svg>
-                  </div>
-                  <div>
-                    <p className="text-sp-white text-sm font-bold">{cat.name}</p>
-                    <p className="text-gray-500 text-sm mt-0.5 leading-relaxed break-words">{cat.prompt}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {/* Style templates */}
-            <p className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Or pick a style</p>
-            <div className="grid grid-cols-2 gap-2 mb-5">
-              {STYLE_TEMPLATES.map(t => (
-                <button
-                  key={t.name}
-                  onClick={() => handleStylePick(t)}
-                  className="flex items-center gap-2.5 bg-charcoal border border-gray-800 rounded-xl p-3 hover:border-crimson/50 active:scale-95 transition-all text-left group"
-                >
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-all" style={{ background: `${t.color}15`, border: `1.5px solid ${t.color}35` }}>
-                    <div className="w-3 h-3 rounded-full" style={{ background: t.color }}/>
-                  </div>
-                  <span className="text-sp-white text-sm font-bold leading-tight">{t.name}</span>
-                </button>
-              ))}
-            </div>
-
             {/* Pin text fields */}
             <p className="text-sp-white text-lg font-bold mb-1">Pin Text</p>
             <p className="text-gray-400 text-sm mb-3">All optional. Leave blank for a text-free pin. We add the text after — the AI never has to spell it.</p>
@@ -415,8 +371,8 @@ export default function DesignPage() {
             </div>
 
             {/* Describe your pin */}
-            <p className="text-sp-white text-lg font-bold mb-2">Or Just Describe It</p>
-            <p className="text-gray-400 text-sm mb-3">Type your own idea. Keep it simple — the AI handles the details.</p>
+            <p className="text-sp-white text-lg font-bold mb-2">Describe Your Pin</p>
+            <p className="text-gray-400 text-sm mb-3">Type your idea. Keep it simple — the AI handles the details.</p>
 
             <form onSubmit={handleFormSubmit} className="flex flex-col gap-3 mb-4">
               <textarea
@@ -468,10 +424,60 @@ export default function DesignPage() {
             </form>
 
             {/* Tips */}
-            <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-4">
+            <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-6">
               <p className="text-gray-400 text-sm leading-relaxed">
                 <span className="text-sp-white font-bold">Tip:</span> Bold shape, one wow feature (spinner, dangler, glitter, or glow). Pick one — five stacked together looks busy.
               </p>
+            </div>
+
+            {/* Inspiration helpers — appear AFTER the design dialogue so the
+                primary path is the text fields + describe + generate. */}
+            <div className="mb-2">
+              <p className="text-gray-400 text-sm font-bold uppercase tracking-wider">Need Inspiration?</p>
+              <p className="text-gray-500 text-sm">Tap any of these to fill in the description above, then tweak it.</p>
+            </div>
+
+            {/* Award categories as design prompts */}
+            <p className="text-sp-white text-base font-bold mt-4 mb-2">Design for an Award</p>
+            <div className="grid grid-cols-1 gap-2 mb-5">
+              {[
+                { name: 'Best Trader', prompt: 'Design the pin everyone at Cooperstown fights over. Bold shape, clean look, impossible to pass up in a trade.', color: '#FFD700', icon: 'M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3' },
+                { name: 'Most Creative', prompt: 'Make something nobody has ever seen on a pin before. Surprise everyone. Go weird.', color: '#FF5500', icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z' },
+                { name: 'Cooperstown Spirit', prompt: 'Capture the Cooperstown Dreams Park experience. The trip, the fields, the feeling of being there.', color: '#4488FF', icon: 'M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4' },
+                { name: "Coach's Pick", prompt: 'Design the pin the coaches would want on their lanyard. Clean, tough, represents the team.', color: '#C41230', icon: 'M9 2h6l3 7H6L9 2zM4 9h16v13H4z' },
+                { name: 'Secret Drop', prompt: 'Design the mystery limited-edition surprise pin. Something rare, something special, something nobody expects.', color: '#22FF66', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8' },
+              ].map(cat => (
+                <button
+                  key={cat.name}
+                  onClick={() => { setDescription(cat.prompt); textareaRef.current?.focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="flex items-center gap-3 bg-charcoal border border-gray-800 rounded-xl p-3.5 hover:border-crimson/50 active:scale-[0.98] transition-all text-left group"
+                >
+                  <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all" style={{ background: `${cat.color}15`, border: `1.5px solid ${cat.color}40` }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={cat.icon}/></svg>
+                  </div>
+                  <div>
+                    <p className="text-sp-white text-sm font-bold">{cat.name}</p>
+                    <p className="text-gray-500 text-sm mt-0.5 leading-relaxed break-words">{cat.prompt}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Style templates */}
+            <p className="text-sp-white text-base font-bold mb-2">Pick a Style</p>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {STYLE_TEMPLATES.map(t => (
+                <button
+                  key={t.name}
+                  onClick={() => { handleStylePick(t); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="flex items-center gap-2.5 bg-charcoal border border-gray-800 rounded-xl p-3 hover:border-crimson/50 active:scale-95 transition-all text-left group"
+                >
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-all" style={{ background: `${t.color}15`, border: `1.5px solid ${t.color}35` }}>
+                    <div className="w-3 h-3 rounded-full" style={{ background: t.color }}/>
+                  </div>
+                  <span className="text-sp-white text-sm font-bold leading-tight">{t.name}</span>
+                </button>
+              ))}
             </div>
           </div>
         )}

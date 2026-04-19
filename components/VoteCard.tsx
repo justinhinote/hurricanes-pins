@@ -224,8 +224,8 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
         </div>
       </div>
 
-      {/* Pin image with drag */}
-      <div className="flex-1 flex items-center justify-center px-4 overflow-hidden relative">
+      {/* Pin image with drag — pb leaves room for the fixed vote buttons (72px) and nav (~64px) */}
+      <div className="flex-1 flex items-center justify-center px-4 overflow-hidden relative pb-[160px]">
         {/* CASH overlay label */}
         <div
           className="absolute top-8 right-6 z-20 border-4 border-green-500 rounded-xl px-4 py-2 pointer-events-none"
@@ -265,8 +265,12 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
         </div>
       </div>
 
-      {/* Vote buttons - always visible above the bottom nav */}
-      <div className="flex w-full mb-14" style={{ minHeight: '72px' }}>
+      {/* Vote buttons — fixed above the player nav so they're guaranteed visible
+          on every viewport (small phones were pushing them off-screen). */}
+      <div
+        className="fixed left-0 right-0 z-30 flex"
+        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))', minHeight: '72px' }}
+      >
         <button
           onClick={() => castVote('trash')}
           disabled={voting}
