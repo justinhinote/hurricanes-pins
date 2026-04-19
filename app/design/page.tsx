@@ -20,51 +20,57 @@ interface ChatMessage {
 const STYLE_TEMPLATES = [
   {
     name: 'Hurricane Storm',
-    icon: '/templates/storm.svg',
-    prompt: 'A fierce hurricane storm with lightning and the SP diamond logo',
+    prompt: 'A fierce hurricane storm with lightning and the SP diamond logo, shield-shaped pin',
     color: '#FF5500',
   },
   {
     name: 'Classic Baseball',
-    icon: '/templates/baseball.svg',
-    prompt: 'Classic baseball bats and ball with the SP Hurricanes shield',
+    prompt: 'Classic crossed baseball bats behind a home plate with SP logo, vintage enamel style',
     color: '#C41230',
   },
   {
-    name: 'Skull & Crossbats',
-    icon: '/templates/skull.svg',
-    prompt: 'A skull with baseball bats crossed behind it and the SP logo',
-    color: '#888',
+    name: 'Spinner Pin',
+    prompt: 'A spinning hurricane eye that could rotate as a moving spinner pin, the SP logo in the center',
+    color: '#00BBFF',
   },
   {
     name: 'Fire & Lightning',
-    icon: '/templates/fire.svg',
-    prompt: 'A flaming baseball with lightning bolts and SP diamond',
+    prompt: 'A flaming baseball with lightning bolts and SP diamond, star-shaped pin with pointed edges',
     color: '#FF8800',
   },
   {
+    name: 'Oversized Wild',
+    prompt: 'A big oversized unusually shaped pin with a 3D hurricane tornado, dangling baseball charms hanging off the bottom',
+    color: '#AA44FF',
+  },
+  {
     name: 'Cooperstown',
-    icon: '/templates/cooperstown.svg',
-    prompt: 'Cooperstown Dreams Park with Hurricanes banner and SP logo',
+    prompt: 'Cooperstown Dreams Park entrance with SP Hurricanes banner, pennant-shaped pin',
     color: '#4488FF',
   },
   {
-    name: 'Championship',
-    icon: '/templates/trophy.svg',
-    prompt: 'A championship trophy surrounded by hurricane winds with SP shield',
+    name: 'Light-Up Radar',
+    prompt: 'A hurricane radar weather screen showing a storm, designed as if it could glow or light up, circular pin',
+    color: '#22FF66',
+  },
+  {
+    name: 'Series Set',
+    prompt: 'A collectible pin in a series of 3, this one features the SP diamond shield with a unique pattern background, designed to be collected as a set',
     color: '#FFD700',
   },
 ];
 
 const MODIFIERS = [
-  'Make it look vintage',
-  'Add more lightning',
-  'Make the colors really bold',
-  'Add "Cooperstown 2026" text',
-  'Make it look metallic and shiny',
-  'Make it more aggressive looking',
-  'Add flames coming off the sides',
-  'Put a big SP diamond in the center',
+  'Make it a spinner pin',
+  'Add dangling charms hanging off it',
+  'Make it oversized and wild',
+  'Make it glow like a light-up pin',
+  'Add lightning bolts',
+  'Make it metallic and shiny',
+  'Shield shape instead',
+  'Add "2026" text',
+  'Star-shaped pin',
+  'More aggressive looking',
 ];
 
 export default function DesignPage() {
@@ -198,24 +204,17 @@ export default function DesignPage() {
         {showStylePicker && (
           <div className="mb-5">
             <p className="text-gray-500 text-xs uppercase font-bold tracking-wider mb-3 px-1">Pick a style to start</p>
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-4 gap-2">
               {STYLE_TEMPLATES.map(t => (
                 <button
                   key={t.name}
                   onClick={() => handleStylePick(t)}
-                  className="flex flex-col items-center gap-2 bg-charcoal border border-gray-800 rounded-xl p-3 hover:border-crimson/50 active:scale-95 transition-all"
+                  className="flex flex-col items-center gap-1.5 bg-charcoal border border-gray-800 rounded-xl p-2.5 hover:border-crimson/50 active:scale-95 transition-all"
                 >
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: `${t.color}20`, border: `2px solid ${t.color}40` }}>
-                    <span className="text-lg" style={{ color: t.color }}>
-                      {t.name === 'Hurricane Storm' && (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>)}
-                      {t.name === 'Classic Baseball' && (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 2.8A14 14 0 0 0 8 21.2M16 2.8a14 14 0 0 1 0 18.4"/></svg>)}
-                      {t.name === 'Skull & Crossbats' && (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/><path d="M12 2a8 8 0 0 0-8 8c0 3 1.5 5.5 4 7v3h8v-3c2.5-1.5 4-4 4-7a8 8 0 0 0-8-8z"/></svg>)}
-                      {t.name === 'Fire & Lightning' && (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>)}
-                      {t.name === 'Cooperstown' && (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg>)}
-                      {t.name === 'Championship' && (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 22V8h4v14M8 2h8"/></svg>)}
-                    </span>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: `${t.color}20`, border: `2px solid ${t.color}40` }}>
+                    <div className="w-4 h-4 rounded-full" style={{ background: t.color }} />
                   </div>
-                  <span className="text-sp-white text-xs font-bold leading-tight text-center">{t.name}</span>
+                  <span className="text-sp-white text-[10px] font-bold leading-tight text-center">{t.name}</span>
                 </button>
               ))}
             </div>
