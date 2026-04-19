@@ -63,7 +63,7 @@ export default function JoinPage() {
               HURRICANES
             </h1>
             <p className="mt-3 text-fire text-sm font-bold tracking-widest uppercase">
-              Cooperstown 2025
+              Cooperstown 2026
             </p>
             <p className="mt-1 text-gray-500 text-xs text-center">
               Design a pin &bull; Vote on everyone&apos;s &bull; Best ones get made

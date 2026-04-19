@@ -12,8 +12,17 @@ export async function generateConcepts(brief: string, count: number): Promise<Co
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 4096,
     system: `You are an expert trading pin designer specializing in youth baseball.
-The South Park Hurricanes are a 12U travel baseball team from Charlotte, NC going to Cooperstown.
-Team colors: crimson red and black. Logo: SP diamond shield.
+The South Park Hurricanes (SPYA) are a 12U travel baseball team from Charlotte, NC going to Cooperstown in 2026.
+Team colors: crimson red (#C41230) and black. Logo: SP diamond shield.
+
+TEXT ACCURACY IS CRITICAL:
+- Any text on pins must be spelled EXACTLY: "HURRICANES", "SOUTH PARK", "SPYA", "COOPERSTOWN", "2026"
+- Prefer minimal text (1-2 words or just "SP" / "2026") — misspelled text ruins a pin
+- If a word is risky to render, omit it from the design
+
+PIN SHAPES — vary across concepts:
+- Round/circular, shield, diamond, star, pennant/flag, home plate shape, bat-shaped, hexagon, arrowhead, rectangle with banner
+
 Return ONLY valid JSON. No markdown fences. No explanation.`,
     messages: [
       {
@@ -22,21 +31,22 @@ Return ONLY valid JSON. No markdown fences. No explanation.`,
 
 Generate ${count} distinct trading pin concepts for the South Park Hurricanes.
 Return a JSON array where each element has exactly these fields:
-- concept: string (2-3 sentence visual description of the pin design)
-- dalle_prompt: string (optimized for DALL-E 3; start with "Trading pin,"; be specific about colors, shape, style)
+- concept: string (2-3 sentence visual description of the pin design, including its shape)
+- dalle_prompt: string (optimized for image generation; start with "Trading pin design,"; specify the pin SHAPE, colors, style, and any text EXACTLY as it should appear letter by letter; end with "white background")
 - tags: object with these keys, each an array of strings:
   - color_palette (e.g. ["crimson", "black", "gold"])
   - mascot (e.g. ["hurricane", "baseball", "bat"])
   - style (e.g. ["vintage", "enamel", "bold"])
   - theme (e.g. ["cooperstown", "championship", "storm"])
-  - composition (e.g. ["circular", "shield", "star_burst"])
+  - composition (e.g. ["shield", "pennant", "star_burst", "diamond"])
 
 Rules:
-- Each concept must be meaningfully different from the others
+- Each concept must use a DIFFERENT pin shape
 - Use consistent, lowercase tag vocabulary across all concepts
-- Include "cooperstown" in the theme tags of at least one concept
-- Include the SP diamond logo reference in at least two concepts
-- Make pins that 12-year-old boys would think are cool`,
+- Include the exact year "2026" in prompts (NOT 2025)
+- Any text in dalle_prompt must be spelled out: e.g. 'text reading exactly "HURRICANES" (H-U-R-R-I-C-A-N-E-S)'
+- If a concept has complex text, prefer omitting it over risking misspelling
+- Make pins that 12-year-old boys would think are awesome`,
       },
     ],
   });
@@ -91,7 +101,7 @@ Based on this voting data, return a JSON object with:
 - losing_elements: string[] (specific design elements to avoid in Round 2)
 - suggested_prompts: array of 4 objects, each with:
   - theme: string (short name for this design direction)
-  - prompt_fragment: string (ready-to-use fragment for a DALL-E prompt — specific, visual, 20-40 words)
+  - prompt_fragment: string (ready-to-use fragment for an image prompt — specific, visual, 20-40 words, specify a pin SHAPE that varies between suggestions)
   - rationale: string (1 sentence why this is suggested based on the voting data)`,
       },
     ],

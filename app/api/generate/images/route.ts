@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/app/api/lib/auth';
 import { generateImage } from '@/lib/dalle';
-import { put } from '@vercel/blob';
+import { uploadImage } from '@/lib/upload-image';
 import { getPool } from '@/lib/db';
 import type { ConceptDraft } from '@/lib/types';
 
@@ -21,14 +21,10 @@ export async function POST(req: NextRequest) {
 
   for (const concept of concepts) {
     try {
-      // Generate image from DALL-E
-      const dalleUrl = await generateImage(concept.dalle_prompt);
-
-      // Fetch image and upload to Vercel Blob (DALL-E URLs expire in 1 hour)
-      const imageRes = await fetch(dalleUrl);
-      const imageBlob = await imageRes.blob();
+      // Generate image
+      const imageSource = await generateImage(concept.dalle_prompt);
       const filename = `pins/${round_id}/${Date.now()}.png`;
-      const { url, pathname } = await put(filename, imageBlob, { access: 'public' });
+      const { url, pathname } = await uploadImage(imageSource, filename);
 
       // Flatten tags to a string array
       const tags = [

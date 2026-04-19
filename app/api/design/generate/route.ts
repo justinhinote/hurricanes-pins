@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPool } from '@/lib/db';
 import { getPlayerSession } from '@/app/api/lib/auth';
 import { generateImage } from '@/lib/dalle';
-import { put } from '@vercel/blob';
+import { uploadImage } from '@/lib/upload-image';
 import Anthropic from '@anthropic-ai/sdk';
 
 const MAX_ATTEMPTS = 5;
@@ -49,52 +49,62 @@ export async function POST(req: NextRequest) {
     }, { status: 429 });
   }
 
-  // Use Claude to turn the kid's description into a great DALL-E prompt
+  // Claude turns the kid's description into an image generation prompt
   const claudeRes = await getClaude().messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 512,
-    system: `You turn kids' baseball pin ideas into optimized DALL-E 3 prompts.
-The team: South Park Hurricanes, 12U travel baseball, going to Cooperstown.
+    system: `You turn kids' baseball pin ideas into image generation prompts.
+The team: South Park Hurricanes (SPYA), 12U travel baseball, going to Cooperstown in 2026.
 Team colors: crimson red (#C41230) and black. Logo: SP diamond shield.
-Trading pins are round or shield-shaped enamel pins, about 2 inches wide.
-Return ONLY a JSON object with two fields: "dalle_prompt" and "tags" (array of 5-8 descriptive strings).
+Trading pins come in many shapes: round, shield, diamond, star, pennant, home plate, bat-shaped, etc.
+
+TEXT ACCURACY IS CRITICAL:
+- If the pin includes text, specify EXACT spelling: "HURRICANES" (H-U-R-R-I-C-A-N-E-S), "SOUTH PARK", "SPYA", "COOPERSTOWN" (C-O-O-P-E-R-S-T-O-W-N), "2026"
+- If a word is hard to render accurately, OMIT IT. A pin with no text is better than a pin with misspelled text.
+- Prefer minimal text — 1-2 words max, or just "SP" or "2026"
+
+Return ONLY a JSON object with two fields: "image_prompt" and "tags" (array of 5-8 descriptive strings).
 No markdown. No explanation.`,
     messages: [{
       role: 'user',
       content: `A kid on the team described their pin idea: "${description.trim()}"
 
-Create a DALL-E 3 prompt that captures their idea while making it look like a professional trading pin.
-The prompt should start with "Trading pin design," and specify: enamel pin style, the SP diamond logo somewhere, team colors (crimson red and black), Cooperstown 2025, and the kid's specific idea.`
+Create an image generation prompt that captures their idea as a professional trading pin design.
+The prompt should specify:
+- Pin shape (vary it — not always round. Use shield, star, pennant, diamond, home plate, etc.)
+- Enamel pin style with crisp details
+- Team colors crimson red and black
+- The kid's specific visual idea
+- Minimal text (only include text if you can spell it EXACTLY right: "SP", "SPYA", "2026", "HURRICANES", "SOUTH PARK", "COOPERSTOWN")
+- White or clean background so the pin shape is clear`
     }]
   });
 
   const claudeText = claudeRes.content[0].type === 'text' ? claudeRes.content[0].text : '{}';
-  let dallePrompt: string;
+  let imagePrompt: string;
   let tags: string[];
   try {
     const parsed = JSON.parse(claudeText);
-    dallePrompt = parsed.dalle_prompt;
+    imagePrompt = parsed.image_prompt;
     tags = parsed.tags ?? [];
   } catch {
-    dallePrompt = `Trading pin design, enamel pin style, South Park Hurricanes baseball team, crimson red and black colors, SP diamond logo, Cooperstown 2025, ${description.trim()}, professional sports trading pin, white background`;
+    imagePrompt = `Trading pin design, enamel pin, shield shape, South Park Hurricanes baseball team, crimson red and black colors, SP diamond logo, text reading exactly "SP" and "2026", ${description.trim()}, professional sports trading pin, white background`;
     tags = ['hurricanes', 'baseball', 'cooperstown', 'crimson', 'enamel'];
   }
 
-  // Generate image with DALL-E
-  const dalleUrl = await generateImage(dallePrompt);
+  // Generate image
+  const imageSource = await generateImage(imagePrompt);
 
-  // Upload to Vercel Blob immediately (DALL-E URLs expire in 1 hour)
-  const imageRes = await fetch(dalleUrl);
-  const imageBlob = await imageRes.blob();
+  // Upload to Vercel Blob
   const filename = `pins/${roundId}/player-${playerId}-${Date.now()}.png`;
-  const { url, pathname } = await put(filename, imageBlob, { access: 'public' });
+  const { url, pathname } = await uploadImage(imageSource, filename);
 
   // Save the pin to the DB
   const pinResult = await pool.query(
     `INSERT INTO pins (round_id, concept_text, prompt_used, image_url, blob_key, tags, created_by)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING id, image_url`,
-    [roundId, description.trim(), dallePrompt, url, pathname, tags, playerId]
+    [roundId, description.trim(), imagePrompt, url, pathname, tags, playerId]
   );
 
   // Increment player's attempt count

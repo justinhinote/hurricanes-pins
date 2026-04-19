@@ -60,7 +60,7 @@ const MODIFIERS = [
   'Make it look vintage',
   'Add more lightning',
   'Make the colors really bold',
-  'Add "Cooperstown 2025" text',
+  'Add "Cooperstown 2026" text',
   'Make it look metallic and shiny',
   'Make it more aggressive looking',
   'Add flames coming off the sides',

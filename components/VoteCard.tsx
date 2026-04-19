@@ -133,7 +133,7 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
           Come back later to see if new designs have been added. Go design your own pin!
         </p>
         <p className="mt-8 text-fire text-sm font-bold tracking-widest uppercase">
-          South Park Hurricanes &mdash; Cooperstown 2025
+          South Park Hurricanes &mdash; Cooperstown 2026
         </p>
       </div>
     );

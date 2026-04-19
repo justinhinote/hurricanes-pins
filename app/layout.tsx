@@ -11,7 +11,7 @@ const anton = Anton({
 
 export const metadata: Metadata = {
   title: 'South Park Hurricanes — Pin Design Contest',
-  description: 'Vote on pin designs for the Cooperstown 2025 trip. Cash or Trash!',
+  description: 'Vote on pin designs for the Cooperstown 2026 trip. Cash or Trash!',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

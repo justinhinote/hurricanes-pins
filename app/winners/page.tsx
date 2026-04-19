@@ -20,7 +20,7 @@ export default async function WinnersPage() {
             WINNING PINS
           </h1>
           <p className="text-fire text-sm font-bold tracking-widest uppercase mt-2">
-            Cooperstown 2025 &mdash; South Park Hurricanes
+            Cooperstown 2026 &mdash; South Park Hurricanes
           </p>
         </div>
 
