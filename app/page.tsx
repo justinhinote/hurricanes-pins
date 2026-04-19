@@ -228,14 +228,23 @@ export default async function HomePage() {
             })}
           </div>
 
-          {/* CTA below rankings */}
-          <div className="mt-6 text-center">
+          {/* CTAs below rankings */}
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <Link
               href={hasSession ? '/vote' : '/join'}
-              className="inline-block bg-crimson text-sp-white font-bold px-8 py-3 rounded-xl uppercase tracking-widest text-sm active:scale-95 transition-all"
+              className="flex-1 text-center bg-crimson text-sp-white font-bold px-6 py-4 rounded-xl active:scale-95 transition-all"
               style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(196,18,48,0.4)' }}
             >
-              Vote Now &mdash; Change the Rankings
+              <span className="text-sm uppercase tracking-widest">Vote Now</span>
+              <span className="block text-[10px] text-sp-white/60 uppercase tracking-wider mt-0.5 font-normal">Change the Rankings</span>
+            </Link>
+            <Link
+              href={hasSession ? '/design' : '/join'}
+              className="flex-1 text-center bg-charcoal border-2 border-fire/40 text-sp-white font-bold px-6 py-4 rounded-xl active:scale-95 transition-all hover:border-fire/70"
+              style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}
+            >
+              <span className="text-sm uppercase tracking-widest text-fire">Design</span>
+              <span className="block text-[10px] text-gray-500 uppercase tracking-wider mt-0.5 font-normal">Think You Can Do Better? Prove It</span>
             </Link>
           </div>
         </div>
