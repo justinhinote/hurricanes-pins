@@ -3,6 +3,7 @@ import { getPool } from '@/lib/db';
 import { getPlayerSession } from '@/app/api/lib/auth';
 import { generateImage } from '@/lib/dalle';
 import { uploadImage } from '@/lib/upload-image';
+import { sanitizePinText } from '@/lib/pin-text';
 import Anthropic from '@anthropic-ai/sdk';
 
 // No attempt limit — let the boys cook
@@ -22,10 +23,11 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { description, edit_of, photo, custom_text } = body;
+  const { description, edit_of, photo, text } = body;
   // edit_of: if provided, this is a free refinement (no attempt cost)
   // photo: optional base64 image data for vision-based design
-  // custom_text: optional text to overlay (player name, number, etc.)
+  // text: optional { top, middle, bottom } strings composited via SVG (NOT into the image)
+  const pinText = sanitizePinText(text);
 
   if (!description?.trim() && !photo) {
     return NextResponse.json({ error: 'Describe your pin idea or upload a photo' }, { status: 400 });
@@ -120,7 +122,7 @@ Create an image generation prompt. Specify: pin shape (vary it), enamel pin styl
 
   // Upload to Vercel Blob (permanent URL)
   const filename = `pins/${roundId}/draft-${playerId}-${Date.now()}.png`;
-  const { url, pathname } = await uploadImage(imageSource, filename, custom_text ? { customLine: custom_text } : undefined);
+  const { url, pathname } = await uploadImage(imageSource, filename, pinText);
 
   // Return as DRAFT — not saved to DB yet. Client must call /api/design/submit
   return NextResponse.json({

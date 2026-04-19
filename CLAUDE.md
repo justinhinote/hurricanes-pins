@@ -56,9 +56,13 @@ Only one round is `active` at a time; activating a round archives any other acti
 
 Provider fallback order: **Google Imagen 3 → OpenAI `gpt-image-1` → DALL-E 3**. Imagen is preferred because it renders text far more accurately. Every prompt has `IMAGE_RULES` appended that forbids text in the image — text is composited later by `lib/text-overlay.ts`.
 
-### Text overlay (`lib/text-overlay.ts`)
+### Text overlay (`lib/text-overlay.ts` + `lib/pin-text.ts`)
 
-Sharp + SVG composite. Always renders "SOUTH PARK HURRICANES / 12U · SPYA" at top and "COOPERSTOWN 2026" at bottom. Optional `customLine` (player name/number) injects an extra row. The AI never renders this text — it always comes from the SVG composite. Run the reprocess script after changing the overlay to update existing pins in Blob.
+Sharp + SVG composite. The user (player or admin) controls **up to 3 optional text slots**: `top`, `middle`, `bottom`. All slots are optional — if all are blank the pin has zero text. The top banner renders if either `top` or `middle` is set; the bottom banner renders if `bottom` is set.
+
+Per-slot character limits and defaults live in `lib/pin-text.ts` (`PIN_TEXT_LIMITS` = 18/14/18, `PIN_TEXT_DEFAULTS` = `HURRICANES` / `12U SPYA` / `COOPERSTOWN 2026`). `sanitizeLine` runs on every input — uppercases, strips non-renderable chars, collapses whitespace, hard-truncates. Both client and server call it; never trust raw input.
+
+The AI image prompt continues to forbid all text. Spelling can never be wrong because the user typed it themselves.
 
 ### Preference engine (`lib/preference-engine.ts` + `/api/analyze`)
 
@@ -84,7 +88,7 @@ Tailwind CSS v4 via `@import "tailwindcss"` in `app/globals.css`. Custom theme t
 
 ## Conventions to honor
 
-- **No text in AI-generated images.** All on-pin typography goes through the SVG overlay so we control spelling. Concept prompts and player prompts both forbid text — don't reintroduce it.
+- **No text in AI-generated images.** All on-pin typography is user-typed and composited via the SVG overlay (`lib/text-overlay.ts`). Concept prompts and player prompts both forbid text in the image — don't reintroduce it.
 - **Year is 2026** everywhere (Cooperstown trip year). Earlier commits had to fix `2025` slipping into prompts; keep new prompts on 2026.
 - **Pin shape variety.** The Claude system prompt explicitly demands different shapes across concepts. Don't add a shape constraint that collapses them all to circles.
 - **No emojis** in code, copy, or commits (project-wide rule).

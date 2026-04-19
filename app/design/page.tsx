@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PlayerNav from '@/components/PlayerNav';
+import { PIN_TEXT_LIMITS, PIN_TEXT_DEFAULTS, sanitizeLine, type PinText } from '@/lib/pin-text';
 
 interface DraftPin {
   image_url: string;
@@ -65,8 +66,17 @@ export default function DesignPage() {
   const [justSubmitted, setJustSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [photoData, setPhotoData] = useState<string | null>(null);
+  const [pinText, setPinText] = useState<PinText>({
+    top: PIN_TEXT_DEFAULTS.top,
+    middle: PIN_TEXT_DEFAULTS.middle,
+    bottom: PIN_TEXT_DEFAULTS.bottom,
+  });
   const textareaRef = useAutoResize(description);
   const refineRef = useAutoResize(description);
+
+  function updateTextSlot(slot: keyof PinText, value: string) {
+    setPinText(prev => ({ ...prev, [slot]: sanitizeLine(value, PIN_TEXT_LIMITS[slot]) }));
+  }
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -85,7 +95,7 @@ export default function DesignPage() {
     setError('');
     setJustSubmitted(false);
 
-    const body: Record<string, unknown> = { description: prompt };
+    const body: Record<string, unknown> = { description: prompt, text: pinText };
     if (isEdit && draft) body.edit_of = draft.concept_text;
     if (photoData) body.photo = photoData;
 
@@ -376,6 +386,34 @@ export default function DesignPage() {
               ))}
             </div>
 
+            {/* Pin text fields */}
+            <p className="text-sp-white text-lg font-bold mb-1">Pin Text</p>
+            <p className="text-gray-400 text-sm mb-3">All optional. Leave blank for a text-free pin. We add the text after — the AI never has to spell it.</p>
+            <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-3 mb-5 flex flex-col gap-2.5">
+              {(['top', 'middle', 'bottom'] as const).map(slot => {
+                const labels = { top: 'Top', middle: 'Middle', bottom: 'Bottom' };
+                const value = pinText[slot] ?? '';
+                const max = PIN_TEXT_LIMITS[slot];
+                return (
+                  <div key={slot}>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-gray-400 text-sm font-bold uppercase tracking-wider">{labels[slot]}</label>
+                      <span className={`text-xs ${value.length >= max ? 'text-fire' : 'text-gray-500'}`}>{value.length}/{max}</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={value}
+                      maxLength={max}
+                      onChange={e => updateTextSlot(slot, e.target.value)}
+                      placeholder={`Optional · max ${max} chars`}
+                      className="w-full bg-black/40 border border-gray-700 text-sp-white text-base px-3 py-2.5 rounded-lg focus:outline-none focus:border-crimson placeholder-gray-600 uppercase tracking-wide"
+                      style={{ textTransform: 'uppercase' }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
             {/* Describe your pin */}
             <p className="text-sp-white text-lg font-bold mb-2">Or Just Describe It</p>
             <p className="text-gray-400 text-sm mb-3">Type your own idea. Keep it simple — the AI handles the details.</p>
@@ -432,7 +470,7 @@ export default function DesignPage() {
             {/* Tips */}
             <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-4">
               <p className="text-gray-400 text-sm leading-relaxed">
-                <span className="text-sp-white font-bold">Tips:</span> These are team pins — we order 100+ of the winners. Bold shapes trade best. One special feature (spinner, dangler, glitter, glow) beats five stacked together. Team name and Cooperstown 2026 are added automatically.
+                <span className="text-sp-white font-bold">Tips:</span> These are team pins — we order 100+ of the winners. Bold shapes trade best. One special feature (spinner, dangler, glitter, glow) beats five stacked together. Whatever you typed in the text fields above gets added after the AI finishes drawing.
               </p>
             </div>
           </div>

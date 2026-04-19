@@ -1,18 +1,20 @@
 import { put } from '@vercel/blob';
-import { addTextOverlay, type TextOverlayOptions } from './text-overlay';
+import { addTextOverlay } from './text-overlay';
+import type { PinText } from './pin-text';
 
 /**
  * Upload an image to Vercel Blob with text overlay composited.
+ * Pass `text: false` to skip the overlay entirely (raw image).
  */
 export async function uploadImage(
   imageSource: string,
   blobPath: string,
-  overlayOptions?: TextOverlayOptions | false
+  text?: PinText | false
 ): Promise<{ url: string; pathname: string }> {
   let imageBlob: Blob;
 
-  if (overlayOptions !== false) {
-    const composited = await addTextOverlay(imageSource, overlayOptions || undefined);
+  if (text !== false) {
+    const composited = await addTextOverlay(imageSource, text || undefined);
     imageBlob = new Blob([new Uint8Array(composited)], { type: 'image/png' });
   } else if (imageSource.startsWith('data:')) {
     const base64Data = imageSource.split(',')[1];

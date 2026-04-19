@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Round, ConceptDraft } from '@/lib/types';
+import { PIN_TEXT_LIMITS, PIN_TEXT_DEFAULTS, sanitizeLine, type PinText } from '@/lib/pin-text';
 
 interface GeneratedConcept extends ConceptDraft {
   selected: boolean;
@@ -22,6 +23,15 @@ export default function GeneratePage() {
   const [renderingImages, setRenderingImages] = useState(false);
   const [publishDone, setPublishDone] = useState(false);
   const [error, setError] = useState('');
+  const [pinText, setPinText] = useState<PinText>({
+    top: PIN_TEXT_DEFAULTS.top,
+    middle: PIN_TEXT_DEFAULTS.middle,
+    bottom: PIN_TEXT_DEFAULTS.bottom,
+  });
+
+  function updateTextSlot(slot: keyof PinText, value: string) {
+    setPinText(prev => ({ ...prev, [slot]: sanitizeLine(value, PIN_TEXT_LIMITS[slot]) }));
+  }
 
   useEffect(() => {
     fetch('/api/rounds').then(r => r.json()).then((data: Round[]) => {
@@ -72,7 +82,7 @@ export default function GeneratePage() {
     const res = await fetch('/api/generate/images', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ round_id: selectedRound, concepts: selected }),
+      body: JSON.stringify({ round_id: selectedRound, concepts: selected, text: pinText }),
     });
 
     if (!res.ok) {
@@ -145,6 +155,32 @@ export default function GeneratePage() {
             onChange={e => setCount(parseInt(e.target.value) || 6)}
             className="w-full bg-black/40 border border-gray-700 text-sp-white px-4 py-3 rounded-lg focus:outline-none focus:border-crimson transition-colors"
           />
+        </div>
+        <div>
+          <label className="text-gray-400 text-sm uppercase font-bold tracking-wider mb-1.5 block">Pin Text (applied to every pin in batch)</label>
+          <p className="text-gray-500 text-xs mb-2">All optional. Composited via SVG after image gen — AI never has to spell it.</p>
+          <div className="flex flex-col gap-2">
+            {(['top', 'middle', 'bottom'] as const).map(slot => {
+              const labels = { top: 'Top', middle: 'Middle', bottom: 'Bottom' };
+              const value = pinText[slot] ?? '';
+              const max = PIN_TEXT_LIMITS[slot];
+              return (
+                <div key={slot} className="flex items-center gap-2">
+                  <span className="text-gray-500 text-xs uppercase tracking-wider w-14 shrink-0">{labels[slot]}</span>
+                  <input
+                    type="text"
+                    value={value}
+                    maxLength={max}
+                    onChange={e => updateTextSlot(slot, e.target.value)}
+                    placeholder={`Optional · max ${max}`}
+                    className="flex-1 bg-black/40 border border-gray-700 text-sp-white px-3 py-2 rounded-lg focus:outline-none focus:border-crimson placeholder-gray-600 text-base"
+                    style={{ textTransform: 'uppercase' }}
+                  />
+                  <span className={`text-xs w-10 text-right shrink-0 ${value.length >= max ? 'text-fire' : 'text-gray-500'}`}>{value.length}/{max}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
         <button
           onClick={handleGenerateConcepts}
