@@ -21,9 +21,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 });
   }
 
-  const { description } = await req.json();
-  if (!description?.trim()) {
-    return NextResponse.json({ error: 'Describe your pin idea first' }, { status: 400 });
+  const body = await req.json();
+  const { description, edit_of, photo } = body;
+  // edit_of: if provided, this is a free refinement (no attempt cost)
+  // photo: optional base64 image data for vision-based design
+
+  if (!description?.trim() && !photo) {
+    return NextResponse.json({ error: 'Describe your pin idea or upload a photo' }, { status: 400 });
   }
 
   const pool = getPool();
@@ -37,19 +41,49 @@ export async function POST(req: NextRequest) {
   }
   const roundId = roundResult.rows[0].id;
 
-  // Check player's attempt count
+  // Check attempt count (edits are free, new generations cost 1)
   const playerResult = await pool.query<{ name: string; design_attempts: number }>(
     'SELECT name, design_attempts FROM players WHERE id = $1',
     [playerId]
   );
   const player = playerResult.rows[0];
-  if (player.design_attempts >= MAX_ATTEMPTS) {
+  const isEdit = !!edit_of;
+
+  if (!isEdit && player.design_attempts >= MAX_ATTEMPTS) {
     return NextResponse.json({
-      error: `You've used all ${MAX_ATTEMPTS} design attempts. Your submissions are already in the contest!`
+      error: `You've used all ${MAX_ATTEMPTS} design attempts.`
     }, { status: 429 });
   }
 
-  // Claude turns the kid's description into an image generation prompt
+  // Build the concept description
+  let conceptDescription = description?.trim() ?? '';
+
+  // If a photo was uploaded, use Claude vision to describe it
+  if (photo) {
+    const visionRes = await getClaude().messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: { type: 'base64', media_type: 'image/jpeg', data: photo },
+          },
+          {
+            type: 'text',
+            text: `This is a sketch or reference image for a baseball trading pin design for the South Park Hurricanes (SPYA) team going to Cooperstown 2026. Describe the key visual elements, shapes, and themes in this image in 2-3 sentences so they can be used to generate a polished trading pin design.${conceptDescription ? ` The user also said: "${conceptDescription}"` : ''}`,
+          },
+        ],
+      }],
+    });
+    const visionText = visionRes.content[0].type === 'text' ? visionRes.content[0].text : '';
+    conceptDescription = visionText + (conceptDescription ? `. User notes: ${conceptDescription}` : '');
+  }
+
+  // Claude turns the description into an image generation prompt
+  const editContext = isEdit ? `\nThis is a REVISION of a previous design. The user wants to modify it: "${conceptDescription}". Keep the same general concept but apply the requested changes.` : '';
+
   const claudeRes = await getClaude().messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 512,
@@ -57,26 +91,19 @@ export async function POST(req: NextRequest) {
 The team: South Park Hurricanes (SPYA), 12U travel baseball, going to Cooperstown in 2026.
 Team colors: crimson red (#C41230) and black. Logo: SP diamond shield.
 Trading pins come in many shapes: round, shield, diamond, star, pennant, home plate, bat-shaped, etc.
+Unusual shapes, spinners, oversized pins, and dangling charms are the most wanted for trading.
 
 TEXT ACCURACY IS CRITICAL:
-- If the pin includes text, specify EXACT spelling: "HURRICANES" (H-U-R-R-I-C-A-N-E-S), "SOUTH PARK", "SPYA", "COOPERSTOWN" (C-O-O-P-E-R-S-T-O-W-N), "2026"
-- If a word is hard to render accurately, OMIT IT. A pin with no text is better than a pin with misspelled text.
-- Prefer minimal text — 1-2 words max, or just "SP" or "2026"
+- Spell out exact text letter by letter: "HURRICANES" (H-U-R-R-I-C-A-N-E-S), "SOUTH PARK", "SPYA", "COOPERSTOWN", "2026"
+- Prefer minimal text (just "SP" or "2026") — omit text if it might be misspelled
+- A pin with NO text is better than one with WRONG text
 
-Return ONLY a JSON object with two fields: "image_prompt" and "tags" (array of 5-8 descriptive strings).
-No markdown. No explanation.`,
+Return ONLY a JSON object: {"image_prompt": "...", "tags": ["...", "..."]}. No markdown.`,
     messages: [{
       role: 'user',
-      content: `A kid on the team described their pin idea: "${description.trim()}"
+      content: `Pin idea: "${conceptDescription}"${editContext}
 
-Create an image generation prompt that captures their idea as a professional trading pin design.
-The prompt should specify:
-- Pin shape (vary it — not always round. Use shield, star, pennant, diamond, home plate, etc.)
-- Enamel pin style with crisp details
-- Team colors crimson red and black
-- The kid's specific visual idea
-- Minimal text (only include text if you can spell it EXACTLY right: "SP", "SPYA", "2026", "HURRICANES", "SOUTH PARK", "COOPERSTOWN")
-- White or clean background so the pin shape is clear`
+Create an image generation prompt. Specify: pin shape (vary it), enamel pin style, team colors, the visual idea, and any text EXACTLY as it should appear. White/clean background.`
     }]
   });
 
@@ -88,33 +115,35 @@ The prompt should specify:
     imagePrompt = parsed.image_prompt;
     tags = parsed.tags ?? [];
   } catch {
-    imagePrompt = `Trading pin design, enamel pin, shield shape, South Park Hurricanes baseball team, crimson red and black colors, SP diamond logo, text reading exactly "SP" and "2026", ${description.trim()}, professional sports trading pin, white background`;
+    imagePrompt = `Trading pin design, enamel pin, shield shape, South Park Hurricanes, crimson red and black, text "SP" and "2026", ${conceptDescription}, professional sports trading pin, white background`;
     tags = ['hurricanes', 'baseball', 'cooperstown', 'crimson', 'enamel'];
   }
 
   // Generate image
   const imageSource = await generateImage(imagePrompt);
 
-  // Upload to Vercel Blob
-  const filename = `pins/${roundId}/player-${playerId}-${Date.now()}.png`;
+  // Upload to Vercel Blob (permanent URL)
+  const filename = `pins/${roundId}/draft-${playerId}-${Date.now()}.png`;
   const { url, pathname } = await uploadImage(imageSource, filename);
 
-  // Save the pin to the DB
-  const pinResult = await pool.query(
-    `INSERT INTO pins (round_id, concept_text, prompt_used, image_url, blob_key, tags, created_by)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
-     RETURNING id, image_url`,
-    [roundId, description.trim(), imagePrompt, url, pathname, tags, playerId]
-  );
+  // Increment attempt count (only for new generations, not edits)
+  if (!isEdit) {
+    await pool.query(
+      'UPDATE players SET design_attempts = design_attempts + 1 WHERE id = $1',
+      [playerId]
+    );
+  }
 
-  // Increment player's attempt count
-  await pool.query(
-    'UPDATE players SET design_attempts = design_attempts + 1 WHERE id = $1',
-    [playerId]
-  );
-
+  // Return as DRAFT — not saved to DB yet. Client must call /api/design/submit
   return NextResponse.json({
-    pin: pinResult.rows[0],
-    attempts_remaining: MAX_ATTEMPTS - (player.design_attempts + 1),
+    draft: {
+      image_url: url,
+      blob_key: pathname,
+      concept_text: conceptDescription,
+      prompt_used: imagePrompt,
+      tags,
+      round_id: roundId,
+    },
+    attempts_remaining: MAX_ATTEMPTS - (player.design_attempts + (isEdit ? 0 : 1)),
   });
 }

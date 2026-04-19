@@ -5,153 +5,136 @@ import Image from 'next/image';
 import Link from 'next/link';
 import PlayerNav from '@/components/PlayerNav';
 
-interface GeneratedPin {
-  id: number;
+interface DraftPin {
   image_url: string;
+  blob_key: string;
+  concept_text: string;
+  prompt_used: string;
+  tags: string[];
+  round_id: number;
 }
 
-interface ChatMessage {
-  role: 'system' | 'user' | 'pin';
-  text: string;
-  image_url?: string;
-  pin_id?: number;
+interface SubmittedPin {
+  id: number;
+  image_url: string;
+  concept_text: string;
 }
 
 const STYLE_TEMPLATES = [
-  {
-    name: 'Hurricane Storm',
-    prompt: 'A fierce hurricane storm with lightning and the SP diamond logo, shield-shaped pin',
-    color: '#FF5500',
-  },
-  {
-    name: 'Classic Baseball',
-    prompt: 'Classic crossed baseball bats behind a home plate with SP logo, vintage enamel style',
-    color: '#C41230',
-  },
-  {
-    name: 'Spinner Pin',
-    prompt: 'A spinning hurricane eye that could rotate as a moving spinner pin, the SP logo in the center',
-    color: '#00BBFF',
-  },
-  {
-    name: 'Fire & Lightning',
-    prompt: 'A flaming baseball with lightning bolts and SP diamond, star-shaped pin with pointed edges',
-    color: '#FF8800',
-  },
-  {
-    name: 'Oversized Wild',
-    prompt: 'A big oversized unusually shaped pin with a 3D hurricane tornado, dangling baseball charms hanging off the bottom',
-    color: '#AA44FF',
-  },
-  {
-    name: 'Cooperstown',
-    prompt: 'Cooperstown Dreams Park entrance with SP Hurricanes banner, pennant-shaped pin',
-    color: '#4488FF',
-  },
-  {
-    name: 'Light-Up Radar',
-    prompt: 'A hurricane radar weather screen showing a storm, designed as if it could glow or light up, circular pin',
-    color: '#22FF66',
-  },
-  {
-    name: 'Series Set',
-    prompt: 'A collectible pin in a series of 3, this one features the SP diamond shield with a unique pattern background, designed to be collected as a set',
-    color: '#FFD700',
-  },
+  { name: 'Hurricane Storm', prompt: 'A fierce hurricane storm with lightning and the SP diamond logo, shield-shaped pin', color: '#FF5500' },
+  { name: 'Classic Baseball', prompt: 'Classic crossed baseball bats behind a home plate with SP logo, vintage enamel style', color: '#C41230' },
+  { name: 'Spinner Pin', prompt: 'A spinning hurricane eye that could rotate as a moving spinner pin, the SP logo in the center', color: '#00BBFF' },
+  { name: 'Fire & Lightning', prompt: 'A flaming baseball with lightning bolts and SP diamond, star-shaped pin with pointed edges', color: '#FF8800' },
+  { name: 'Oversized Wild', prompt: 'A big oversized unusually shaped pin with a 3D hurricane tornado, dangling baseball charms', color: '#AA44FF' },
+  { name: 'Cooperstown', prompt: 'Cooperstown Dreams Park entrance with SP Hurricanes banner, pennant-shaped pin', color: '#4488FF' },
+  { name: 'Light-Up Radar', prompt: 'A hurricane radar weather screen showing a storm, designed as if it could glow, circular pin', color: '#22FF66' },
+  { name: 'Series Set', prompt: 'A collectible pin in a series of 3, SP diamond shield with unique pattern background', color: '#FFD700' },
 ];
 
-const MODIFIERS = [
-  'Make it a spinner pin',
-  'Add dangling charms hanging off it',
-  'Make it oversized and wild',
-  'Make it glow like a light-up pin',
-  'Add lightning bolts',
-  'Make it metallic and shiny',
-  'Shield shape instead',
-  'Add "2026" text',
-  'Star-shaped pin',
+const REFINE_CHIPS = [
+  'Make the text clearer',
+  'Add a spinner element',
   'More aggressive looking',
+  'Add dangling charms',
+  'Make it glow',
+  'Shield shape instead',
+  'Add lightning bolts',
+  'Make it bigger and wilder',
+  'Star-shaped pin',
+  'Make it metallic and shiny',
 ];
 
 export default function DesignPage() {
   const [description, setDescription] = useState('');
   const [generating, setGenerating] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'system', text: "What kind of pin do you want? Pick a style below or describe your own idea." }
-  ]);
+  const [draft, setDraft] = useState<DraftPin | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
-  const [submittedCount, setSubmittedCount] = useState(0);
+  const [submittedPins, setSubmittedPins] = useState<SubmittedPin[]>([]);
+  const [justSubmitted, setJustSubmitted] = useState(false);
   const [error, setError] = useState('');
-  const [lastPinId, setLastPinId] = useState<number | null>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [photoData, setPhotoData] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch('/api/design/my-pins')
       .then(r => r.json())
       .then(data => {
         if (typeof data.attempts_remaining === 'number') setAttemptsRemaining(data.attempts_remaining);
-        if (data.pins?.length > 0) {
-          setSubmittedCount(data.pins.length);
-          // Show their previous pins in chat
-          const prevMessages: ChatMessage[] = [
-            { role: 'system', text: `Welcome back! You've made ${data.pins.length} pin${data.pins.length > 1 ? 's' : ''} so far. ${data.attempts_remaining > 0 ? 'Design another one or go vote!' : 'You used all your attempts. Go vote!'}` }
-          ];
-          data.pins.forEach((pin: { id: number; image_url: string; concept_text: string }) => {
-            prevMessages.push({ role: 'pin', text: pin.concept_text, image_url: pin.image_url, pin_id: pin.id });
-          });
-          if (data.attempts_remaining > 0) {
-            prevMessages.push({ role: 'system', text: 'Pick a style or describe a new idea below.' });
-          }
-          setMessages(prevMessages);
-        }
+        if (data.pins) setSubmittedPins(data.pins);
       })
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  async function handleGenerate(prompt: string) {
-    if (!prompt.trim() || generating) return;
+  async function handleGenerate(isEdit = false) {
+    const prompt = description.trim();
+    if (!prompt && !photoData) return;
     setGenerating(true);
     setError('');
-    setDescription('');
+    setJustSubmitted(false);
 
-    // Add user message
-    setMessages(prev => [...prev, { role: 'user', text: prompt }]);
-
-    // Add generating message
-    setMessages(prev => [...prev, { role: 'system', text: 'Designing your pin... this takes about 30 seconds.' }]);
+    const body: Record<string, unknown> = { description: prompt };
+    if (isEdit && draft) body.edit_of = draft.concept_text;
+    if (photoData) body.photo = photoData;
 
     const res = await fetch('/api/design/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ description: prompt }),
+      body: JSON.stringify(body),
     });
 
     const data = await res.json();
-
     if (!res.ok) {
-      setMessages(prev => prev.slice(0, -1)); // Remove "generating" message
-      setMessages(prev => [...prev, { role: 'system', text: data.error ?? 'Something went wrong. Try again.' }]);
+      setError(data.error ?? 'Something went wrong');
       setGenerating(false);
       return;
     }
 
+    setDraft(data.draft);
     setAttemptsRemaining(data.attempts_remaining);
-    setLastPinId(data.pin.id);
-    setSubmittedCount(prev => prev + 1);
-
-    // Replace generating message with the pin
-    setMessages(prev => [
-      ...prev.slice(0, -1),
-      { role: 'pin', text: prompt, image_url: data.pin.image_url, pin_id: data.pin.id },
-      { role: 'system', text: data.attempts_remaining > 0 ? `Nice! Your pin is in the contest. You have ${data.attempts_remaining} attempt${data.attempts_remaining !== 1 ? 's' : ''} left. Try another style or go vote!` : 'Your pin is in the contest! You used all your attempts. Time to go vote on everyone\'s pins!' }
-    ]);
-
+    setPhotoData(null);
     setGenerating(false);
+  }
+
+  async function handleSubmit() {
+    if (!draft) return;
+    setSubmitting(true);
+    const res = await fetch('/api/design/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(draft),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setSubmittedPins(prev => [{ id: data.pin.id, image_url: draft.image_url, concept_text: draft.concept_text }, ...prev]);
+      setDraft(null);
+      setDescription('');
+      setJustSubmitted(true);
+    }
+    setSubmitting(false);
+  }
+
+  function handleDiscard() {
+    setDraft(null);
+    setDescription('');
+  }
+
+  function handleRefine(chip: string) {
+    setDescription(chip);
+    inputRef.current?.focus();
+  }
+
+  function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Strip the data:image/...;base64, prefix
+      setPhotoData(result.split(',')[1]);
+    };
+    reader.readAsDataURL(file);
   }
 
   function handleStylePick(template: typeof STYLE_TEMPLATES[0]) {
@@ -159,204 +142,256 @@ export default function DesignPage() {
     inputRef.current?.focus();
   }
 
-  function handleModifier(mod: string) {
-    setDescription(prev => prev ? `${prev}. ${mod}` : mod);
-    inputRef.current?.focus();
-  }
-
-  function handleSubmit(e: React.FormEvent) {
+  function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
-    handleGenerate(description);
+    handleGenerate(!!draft);
   }
 
-  const outOfAttempts = attemptsRemaining !== null && attemptsRemaining <= 0;
-  const showStylePicker = messages.length <= 2 && !generating;
-  const hasGeneratedPin = messages.some(m => m.role === 'pin');
+  const outOfAttempts = attemptsRemaining !== null && attemptsRemaining <= 0 && !draft;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
+    <div className="min-h-screen flex flex-col pb-16" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
       <PlayerNav />
 
-      {/* Header with logo */}
-      <div className="px-5 pt-5 pb-2">
+      {/* Header */}
+      <div className="px-5 pt-5 pb-3">
         <div className="flex items-center gap-3">
           <span className="text-crimson text-2xl font-bold shrink-0" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
           <div className="flex-1">
-            <h1 className="text-sp-white text-xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+            <h1 className="text-sp-white text-2xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
               DESIGN YOUR PIN
             </h1>
             <p className="text-gray-400 text-sm">Best designs get made into real trading pins</p>
           </div>
           {attemptsRemaining !== null && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-2 h-2 rounded-full ${i < (5 - attemptsRemaining) ? 'bg-crimson' : 'bg-gray-700'}`}
-                />
+                <div key={i} className={`w-2.5 h-2.5 rounded-full ${i < (5 - (attemptsRemaining ?? 0)) ? 'bg-crimson' : 'bg-gray-700'}`}/>
               ))}
-              <span className="text-gray-400 text-xs ml-1">{attemptsRemaining}</span>
+              <span className="text-gray-400 text-sm ml-1">{attemptsRemaining}</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Chat area */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4" style={{ paddingBottom: outOfAttempts ? '80px' : '180px' }}>
+      {/* Main content area */}
+      <div className="flex-1 overflow-y-auto px-5">
 
-        {/* Style picker - shown at start */}
-        {showStylePicker && (
-          <div className="mb-4">
-            {/* Intro card */}
-            <div className="bg-charcoal/60 border border-gray-800 rounded-2xl p-4 mb-4">
-              <div className="flex gap-3 items-start">
-                <div className="shrink-0 w-10 h-10 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C41230" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/>
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sp-white text-base font-bold">Describe your dream pin</p>
-                  <p className="text-gray-400 text-sm mt-1 leading-relaxed">Pick a style below or type your own idea. Spinners, oversized shapes, glow effects — the crazier the better for Cooperstown trading.</p>
-                </div>
-              </div>
+        {/* === DRAFT PREVIEW MODE === */}
+        {draft && !justSubmitted && (
+          <div className="animate-fade-in">
+            <p className="text-sp-white text-lg font-bold text-center mb-3">Your Design</p>
+
+            {/* Pin preview */}
+            <div className="relative w-full max-w-sm mx-auto aspect-square rounded-2xl overflow-hidden border-2 border-crimson/40 mb-4"
+              style={{ boxShadow: '0 0 40px rgba(255,85,0,0.2)' }}>
+              <Image src={draft.image_url} alt="Your pin design" fill className="object-contain" sizes="380px" priority />
             </div>
 
-            <p className="text-gray-400 text-sm uppercase font-bold tracking-widest mb-2.5 px-1">Pick a style</p>
-            <div className="grid grid-cols-4 gap-2">
+            {/* Action buttons */}
+            <div className="flex gap-3 mb-4 max-w-sm mx-auto">
+              <button
+                onClick={handleDiscard}
+                className="flex-1 py-4 rounded-xl border-2 border-gray-700 text-gray-300 font-bold text-base uppercase tracking-widest active:scale-95 transition-all"
+              >
+                Discard
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="flex-2 py-4 rounded-xl bg-green-600 text-white font-bold text-lg uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
+                style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(34,197,94,0.3)', flex: 2 }}
+              >
+                {submitting ? 'Submitting...' : 'Submit to Contest'}
+              </button>
+            </div>
+
+            {/* Refine section */}
+            <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-4 max-w-sm mx-auto">
+              <p className="text-fire text-sm font-bold uppercase tracking-wide mb-2">Refine This Design (free)</p>
+              <p className="text-gray-400 text-sm mb-3">Describe what to change — doesn&apos;t use an attempt</p>
+
+              <div className="flex flex-wrap gap-2 mb-3">
+                {REFINE_CHIPS.slice(0, 6).map(chip => (
+                  <button
+                    key={chip}
+                    onClick={() => handleRefine(chip)}
+                    className="text-sm px-3 py-1.5 bg-black/40 border border-gray-700 text-gray-300 rounded-full hover:border-crimson/50 hover:text-sp-white active:scale-95 transition-all"
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+
+              <form onSubmit={handleFormSubmit} className="flex gap-2">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  placeholder="Change the colors, add text, etc..."
+                  disabled={generating}
+                  className="flex-1 bg-black/40 border border-gray-700 text-sp-white text-base px-4 py-3 rounded-full focus:outline-none focus:border-crimson placeholder-gray-500 disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={!description.trim() || generating}
+                  className="shrink-0 w-12 h-12 bg-fire rounded-full flex items-center justify-center disabled:opacity-40 active:scale-90 transition-all"
+                >
+                  {generating ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"/>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* === JUST SUBMITTED === */}
+        {justSubmitted && (
+          <div className="bg-green-600/10 border border-green-600/40 rounded-xl p-5 text-center animate-fade-in mb-5">
+            <p className="text-green-500 text-lg font-bold">Pin submitted to the contest!</p>
+            <p className="text-gray-400 text-base mt-1">Now get your teammates to vote on it.</p>
+            <div className="flex gap-3 justify-center mt-4">
+              <Link href="/vote" className="text-base text-crimson font-bold hover:text-fire transition-colors">
+                Go vote
+              </Link>
+              {attemptsRemaining && attemptsRemaining > 0 && (
+                <button onClick={() => setJustSubmitted(false)} className="text-base text-gray-400 font-bold hover:text-sp-white transition-colors">
+                  Design another
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* === GENERATING SPINNER === */}
+        {generating && !draft && (
+          <div className="animate-fade-in flex flex-col items-center py-10">
+            <div className="w-64 h-64 bg-charcoal rounded-2xl border border-crimson/20 flex flex-col items-center justify-center gap-4"
+              style={{ boxShadow: '0 0 30px rgba(255,85,0,0.1)' }}>
+              <div className="w-14 h-14 border-3 border-fire border-t-transparent rounded-full animate-spin"/>
+              <div className="text-center">
+                <p className="text-sp-white text-lg font-bold">Creating your pin...</p>
+                <p className="text-gray-400 text-sm mt-1">AI is drawing your design (~30s)</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* === DESIGN INPUT (no draft, not generating) === */}
+        {!draft && !generating && !justSubmitted && !outOfAttempts && (
+          <div>
+            {/* Submitted pins gallery */}
+            {submittedPins.length > 0 && (
+              <div className="mb-5">
+                <p className="text-fire text-sm font-bold uppercase tracking-wide mb-2">Your Submissions</p>
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  {submittedPins.map(pin => (
+                    <div key={pin.id} className="shrink-0 w-24">
+                      <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-crimson/30"
+                        style={{ boxShadow: '0 0 10px rgba(255,85,0,0.15)' }}>
+                        <Image src={pin.image_url} alt={pin.concept_text} fill className="object-contain" sizes="96px" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Intro + style picker */}
+            <div className="bg-charcoal/60 border border-gray-800 rounded-2xl p-4 mb-4">
+              <p className="text-sp-white text-base font-bold mb-1">Describe your dream pin</p>
+              <p className="text-gray-400 text-sm leading-relaxed">Pick a style below, type your own idea, or upload a sketch. Spinners, oversized shapes, glow effects — the crazier the better.</p>
+            </div>
+
+            <p className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Pick a style</p>
+            <div className="grid grid-cols-4 gap-2 mb-5">
               {STYLE_TEMPLATES.map(t => (
                 <button
                   key={t.name}
                   onClick={() => handleStylePick(t)}
                   className="flex flex-col items-center gap-1.5 bg-charcoal border border-gray-800 rounded-xl p-2.5 hover:border-crimson/50 active:scale-95 transition-all group"
                 >
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-all group-hover:scale-110" style={{ background: `${t.color}15`, border: `1.5px solid ${t.color}35` }}>
-                    <div className="w-5 h-5 rounded-full" style={{ background: `${t.color}`, boxShadow: `0 0 8px ${t.color}40` }} />
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all"
+                    style={{ background: `${t.color}15`, border: `1.5px solid ${t.color}35` }}>
+                    <div className="w-4 h-4 rounded-full" style={{ background: t.color, boxShadow: `0 0 8px ${t.color}40` }}/>
                   </div>
                   <span className="text-sp-white text-xs font-bold leading-tight text-center">{t.name}</span>
                 </button>
               ))}
             </div>
+
+            {/* Photo upload */}
+            {photoData && (
+              <div className="flex items-center gap-3 mb-3 bg-charcoal/60 border border-gray-800 rounded-xl p-3">
+                <div className="w-14 h-14 bg-black/40 rounded-lg overflow-hidden relative shrink-0">
+                  <Image src={`data:image/jpeg;base64,${photoData}`} alt="Your sketch" fill className="object-cover" sizes="56px"/>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sp-white text-sm font-bold">Photo attached</p>
+                  <p className="text-gray-400 text-sm">AI will use this as inspiration</p>
+                </div>
+                <button onClick={() => setPhotoData(null)} className="text-gray-400 hover:text-fire text-sm">Remove</button>
+              </div>
+            )}
+
+            {/* Input area */}
+            <form onSubmit={handleFormSubmit} className="flex gap-2 mb-2">
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="shrink-0 w-12 h-12 bg-charcoal border border-gray-700 rounded-full flex items-center justify-center hover:border-crimson/50 active:scale-90 transition-all"
+                title="Upload a photo or sketch"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handlePhotoSelect}
+              />
+              <input
+                ref={inputRef}
+                type="text"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Describe your pin idea..."
+                className="flex-1 bg-charcoal border border-gray-700 text-sp-white text-base px-4 py-3 rounded-full focus:outline-none focus:border-crimson placeholder-gray-500"
+              />
+              <button
+                type="submit"
+                disabled={!description.trim() && !photoData}
+                className="shrink-0 w-12 h-12 bg-crimson rounded-full flex items-center justify-center disabled:opacity-40 active:scale-90 transition-all"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+              </button>
+            </form>
+
+            {error && <p className="text-fire text-sm mt-1">{error}</p>}
           </div>
         )}
 
-        {/* Chat messages */}
-        <div className="flex flex-col gap-3">
-          {messages.map((msg, i) => {
-            if (msg.role === 'system') {
-              return (
-                <div key={i} className="flex justify-center">
-                  <p className="text-gray-400 text-base text-center max-w-xs bg-charcoal/50 rounded-xl px-4 py-2.5">
-                    {msg.text}
-                  </p>
-                </div>
-              );
-            }
-            if (msg.role === 'user') {
-              return (
-                <div key={i} className="flex justify-end">
-                  <div className="bg-crimson rounded-2xl rounded-br-sm px-4 py-3 max-w-[80%]">
-                    <p className="text-sp-white text-base">{msg.text}</p>
-                  </div>
-                </div>
-              );
-            }
-            if (msg.role === 'pin') {
-              return (
-                <div key={i} className="flex justify-start">
-                  <div className="bg-charcoal rounded-2xl rounded-bl-sm border border-crimson/30 overflow-hidden max-w-[85%]"
-                    style={{ boxShadow: '0 0 24px rgba(255,85,0,0.15)' }}>
-                    <div className="relative w-full" style={{ aspectRatio: '1/1', maxWidth: '280px' }}>
-                      <Image
-                        src={msg.image_url!}
-                        alt="Your pin design"
-                        fill
-                        className="object-contain"
-                        sizes="280px"
-                      />
-                    </div>
-                    <div className="px-3 py-2 border-t border-gray-800">
-                      <p className="text-fire text-sm font-bold">In the contest!</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            }
-            return null;
-          })}
-
-          {/* Generating spinner — visual progress */}
-          {generating && (
-            <div className="flex justify-start">
-              <div className="bg-charcoal rounded-2xl rounded-bl-sm border border-crimson/20 overflow-hidden max-w-[85%]" style={{ boxShadow: '0 0 24px rgba(255,85,0,0.1)' }}>
-                {/* Animated placeholder */}
-                <div className="w-64 h-64 sm:w-72 sm:h-72 flex flex-col items-center justify-center gap-4 relative">
-                  <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, rgba(196,18,48,0.08) 0%, transparent 70%)' }}/>
-                  <div className="w-12 h-12 border-3 border-fire border-t-transparent rounded-full animate-spin"/>
-                  <div className="text-center">
-                    <p className="text-sp-white text-base font-bold">Creating your pin...</p>
-                    <p className="text-gray-400 text-sm mt-1">AI is drawing your design (~30s)</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div ref={chatEndRef} />
-        </div>
+        {/* === OUT OF ATTEMPTS === */}
+        {outOfAttempts && !justSubmitted && (
+          <div className="text-center py-10">
+            <p className="text-gray-400 text-lg mb-2">You&apos;ve used all your design attempts.</p>
+            <p className="text-gray-500 text-base mb-4">Your {submittedPins.length} pin{submittedPins.length !== 1 ? 's are' : ' is'} in the contest!</p>
+            <Link href="/vote" className="inline-block bg-crimson text-sp-white font-bold px-8 py-4 rounded-xl text-lg uppercase tracking-widest active:scale-95 transition-all">
+              Vote Now
+            </Link>
+          </div>
+        )}
       </div>
-
-      {/* Input area */}
-      {!outOfAttempts ? (
-        <div className="fixed bottom-14 left-0 right-0 z-30 bg-black/95 backdrop-blur-sm border-t border-gray-800 px-4 py-3">
-          {/* Modifier chips - show after they've generated at least one pin */}
-          {hasGeneratedPin && !generating && (
-            <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
-              {MODIFIERS.map(mod => (
-                <button
-                  key={mod}
-                  onClick={() => handleModifier(mod)}
-                  className="shrink-0 text-sm px-3 py-1.5 bg-charcoal border border-gray-700 text-gray-400 rounded-full hover:border-crimson/50 hover:text-sp-white transition-colors active:scale-95 whitespace-nowrap"
-                >
-                  {mod}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="Describe your pin idea..."
-              disabled={generating}
-              className="flex-1 bg-charcoal border border-gray-700 text-sp-white text-base px-4 py-3 rounded-full focus:outline-none focus:border-crimson transition-colors disabled:opacity-50 placeholder-gray-500"
-            />
-            <button
-              type="submit"
-              disabled={!description.trim() || generating}
-              className="shrink-0 w-12 h-12 bg-crimson rounded-full flex items-center justify-center disabled:opacity-40 active:scale-90 transition-all"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-              </svg>
-            </button>
-          </form>
-          {error && <p className="text-fire text-sm mt-1 px-2">{error}</p>}
-        </div>
-      ) : (
-        <div className="fixed bottom-14 left-0 right-0 z-30 bg-black/95 backdrop-blur-sm border-t border-gray-800 px-4 py-3 text-center">
-          <p className="text-gray-400 text-base mb-2">All {submittedCount} of your pins are in the contest!</p>
-          <Link
-            href="/vote"
-            className="inline-block bg-crimson text-sp-white font-bold px-8 py-3 rounded-full uppercase tracking-widest text-lg active:scale-95 transition-all"
-          >
-            Vote Now
-          </Link>
-        </div>
-      )}
     </div>
   );
 }
