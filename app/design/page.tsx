@@ -21,27 +21,27 @@ interface SubmittedPin {
 }
 
 const STYLE_TEMPLATES = [
-  { name: 'Hurricane Storm', prompt: 'A fierce hurricane storm with lightning and the SP diamond logo, shield-shaped pin', color: '#FF5500' },
-  { name: 'Classic Baseball', prompt: 'Classic crossed baseball bats behind a home plate with SP logo, vintage enamel style', color: '#C41230' },
+  { name: 'Hurricane Baseball', prompt: 'A baseball at the eye of a hurricane storm with red-and-black lightning, custom cyclone-shaped pin outline', color: '#FF5500' },
+  { name: 'Storm Flag', prompt: 'Hurricane warning pennant flag shape with a dangling Cooperstown 2026 charm, team colors', color: '#C41230' },
+  { name: 'Cooperstown Arrival', prompt: 'Dreams Park entrance arch under a storm sky with South Park Hurricanes wordmark, badge-style pin', color: '#4488FF' },
+  { name: 'Radar Pin', prompt: 'Weather radar screen showing a glowing storm cell over a baseball diamond, circular pin with glow effect', color: '#22FF66' },
   { name: 'Spinner Pin', prompt: 'A spinning hurricane eye that could rotate as a moving spinner pin, the SP logo in the center', color: '#00BBFF' },
   { name: 'Fire & Lightning', prompt: 'A flaming baseball with lightning bolts and SP diamond, star-shaped pin with pointed edges', color: '#FF8800' },
   { name: 'Oversized Wild', prompt: 'A big oversized unusually shaped pin with a 3D hurricane tornado, dangling baseball charms', color: '#AA44FF' },
-  { name: 'Cooperstown', prompt: 'Cooperstown Dreams Park entrance with SP Hurricanes banner, pennant-shaped pin', color: '#4488FF' },
-  { name: 'Light-Up Radar', prompt: 'A hurricane radar weather screen showing a storm, designed as if it could glow, circular pin', color: '#22FF66' },
   { name: 'Series Set', prompt: 'A collectible pin in a series of 3, SP diamond shield with unique pattern background', color: '#FFD700' },
 ];
 
 const REFINE_CHIPS = [
-  'Make the text clearer',
-  'Add a spinner element',
-  'More aggressive looking',
-  'Add dangling charms',
-  'Make it glow',
+  'Make the shape bolder',
+  'Simplify the design',
+  'Add one spinner element',
+  'Make it a dangler pin',
+  'Bolder color contrast',
+  'Fewer words on the pin',
+  'Make it look like real enamel',
+  'Add glitter to one element',
   'Shield shape instead',
-  'Add lightning bolts',
-  'Make it bigger and wilder',
-  'Star-shaped pin',
-  'Make it metallic and shiny',
+  'Add a Cooperstown charm',
 ];
 
 // Auto-expanding textarea hook
@@ -310,13 +310,42 @@ export default function DesignPage() {
               </div>
             )}
 
-            {/* Intro */}
-            <div className="bg-charcoal/60 border border-gray-800 rounded-2xl p-4 mb-4">
-              <p className="text-sp-white text-base font-bold mb-1">Describe your dream pin</p>
-              <p className="text-gray-400 text-sm leading-relaxed">Pick a style below, type your own idea, or upload a sketch. Spinners, oversized shapes, glow effects — the crazier the better.</p>
+            {/* Design Brief */}
+            <div className="bg-charcoal/60 border border-gray-700 rounded-2xl p-4 mb-4">
+              <p className="text-fire text-sm font-bold uppercase tracking-widest mb-3">PIN DESIGN BRIEF</p>
+
+              <div className="mb-3">
+                <p className="text-crimson text-xs font-bold uppercase tracking-wide mb-1">Must include:</p>
+                <ul className="text-gray-300 text-sm space-y-0.5 pl-4 list-disc">
+                  <li>South Park Hurricanes identity (team colors, SP, or name)</li>
+                  <li>Cooperstown 2026 reference</li>
+                  <li>One baseball element (bat, ball, diamond, glove)</li>
+                  <li>One storm/hurricane element (wind, lightning, eye, clouds)</li>
+                </ul>
+              </div>
+
+              <div className="mb-3">
+                <p className="text-fire text-xs font-bold uppercase tracking-wide mb-1">Aim for:</p>
+                <ul className="text-gray-300 text-sm space-y-0.5 pl-4 list-disc">
+                  <li>One bold custom shape (not just a circle)</li>
+                  <li>6-8 words of text maximum</li>
+                  <li>One special feature (spinner, dangler, glitter, or glow)</li>
+                  <li>2-4 main colors plus metal outline</li>
+                </ul>
+              </div>
+
+              <div>
+                <p className="text-red-500 text-xs font-bold uppercase tracking-wide mb-1">Avoid:</p>
+                <ul className="text-gray-300 text-sm space-y-0.5 pl-4 list-disc">
+                  <li>Tiny scenes crammed together</li>
+                  <li>Long sentences or too many words</li>
+                  <li>Multiple effects stacked on each other</li>
+                  <li>Logos or characters you don&apos;t own</li>
+                </ul>
+              </div>
             </div>
 
-            <p className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Pick a style</p>
+            <p className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">CONCEPT DIRECTIONS</p>
             <div className="grid grid-cols-4 gap-2 mb-5">
               {STYLE_TEMPLATES.map(t => (
                 <button

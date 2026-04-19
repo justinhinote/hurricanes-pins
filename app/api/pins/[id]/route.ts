@@ -18,16 +18,34 @@ export async function PATCH(
   const body = await req.json();
   const pool = getPool();
 
+  const updates: string[] = [];
+  const values: unknown[] = [];
+  let paramIndex = 1;
+
   if (typeof body.is_winner === 'boolean') {
-    const result = await pool.query(
-      'UPDATE pins SET is_winner = $1 WHERE id = $2 RETURNING *',
-      [body.is_winner, pinId]
-    );
-    if (result.rowCount === 0) {
-      return NextResponse.json({ error: 'Pin not found' }, { status: 404 });
-    }
-    return NextResponse.json(result.rows[0]);
+    updates.push(`is_winner = $${paramIndex++}`);
+    values.push(body.is_winner);
+  }
+  if (body.award_category !== undefined) {
+    updates.push(`award_category = $${paramIndex++}`);
+    values.push(body.award_category);
+  }
+  if (typeof body.manufacturability_score === 'number') {
+    updates.push(`manufacturability_score = $${paramIndex++}`);
+    values.push(body.manufacturability_score);
   }
 
-  return NextResponse.json({ error: 'Nothing to update' }, { status: 400 });
+  if (updates.length === 0) {
+    return NextResponse.json({ error: 'Nothing to update' }, { status: 400 });
+  }
+
+  values.push(pinId);
+  const result = await pool.query(
+    `UPDATE pins SET ${updates.join(', ')} WHERE id = $${paramIndex} RETURNING *`,
+    values
+  );
+  if (result.rowCount === 0) {
+    return NextResponse.json({ error: 'Pin not found' }, { status: 404 });
+  }
+  return NextResponse.json(result.rows[0]);
 }

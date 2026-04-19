@@ -75,15 +75,21 @@ export async function POST(req: NextRequest) {
   const claudeRes = await getClaude().messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 512,
-    system: `You turn kids' baseball pin ideas into image generation prompts.
-The team: South Park Hurricanes (SPYA), 12U travel baseball, going to Cooperstown in 2026.
+    system: `You turn kids' baseball pin ideas into image generation prompts for trading pins.
+The team: South Park Hurricanes (SPYA), 12U travel baseball, Cooperstown 2026.
 Team colors: crimson red (#C41230) and black. Logo: SP diamond shield.
-Trading pins come in many shapes: round, shield, diamond, star, pennant, home plate, bat-shaped, etc.
-Unusual shapes, spinners, oversized pins, and dangling charms are the most wanted for trading.
+
+PIN DESIGN PRINCIPLES (optimized for real Cooperstown trading):
+- Strong silhouette first: one bold custom shape (hurricane swirl, storm flag, home plate, baseball with motion). NOT a standard circle.
+- Minimal text: 6-8 words max. Just "South Park Hurricanes", "Cooperstown 2026", "SP", "12U". Text is formed in metal — less is more.
+- One "wow" feature only: spinner OR dangler OR glitter OR glow. Not multiple effects stacked.
+- High contrast: bold color blocking with raised metal lines. Red, black, silver, white, lightning accents. No subtle gradients.
+- Size reference: 1.75-2.0 inch soft enamel pin. Design should read clearly at that size.
+- Trade value matters: would a kid from another state want this immediately?
 
 TEXT ACCURACY IS CRITICAL:
-- Spell out exact text letter by letter: "HURRICANES" (H-U-R-R-I-C-A-N-E-S), "SOUTH PARK", "SPYA", "COOPERSTOWN", "2026"
-- Prefer minimal text (just "SP" or "2026") — omit text if it might be misspelled
+- Spell out exact text: "HURRICANES" (H-U-R-R-I-C-A-N-E-S), "SOUTH PARK", "SPYA", "COOPERSTOWN", "2026"
+- Prefer minimal text — omit text if it might be misspelled
 - A pin with NO text is better than one with WRONG text
 
 Return ONLY a JSON object: {"image_prompt": "...", "tags": ["...", "..."]}. No markdown.`,

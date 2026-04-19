@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS pins (
   is_winner    BOOLEAN NOT NULL DEFAULT FALSE,
   tags         TEXT[] NOT NULL DEFAULT '{}',
   created_by   INTEGER REFERENCES players(id),
+  award_category TEXT,
+  manufacturability_score INTEGER,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -36,6 +38,7 @@ CREATE TABLE IF NOT EXISTS votes (
   player_id INTEGER NOT NULL REFERENCES players(id) ON DELETE CASCADE,
   pin_id    INTEGER NOT NULL REFERENCES pins(id) ON DELETE CASCADE,
   value     TEXT NOT NULL,
+  reasons   TEXT[] DEFAULT '{}',
   voted_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (player_id, pin_id),
   CONSTRAINT votes_value_check CHECK (value IN ('cash', 'trash'))

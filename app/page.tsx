@@ -138,21 +138,58 @@ export default async function HomePage() {
             <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">1</span>
             <div>
               <p className="text-sp-white font-bold text-base">Design Your Pin</p>
-              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Describe your dream pin and AI creates it. Spinners, oversized shapes, dangling charms, light-up styles — the wildest pins get traded most at Cooperstown.</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Describe a pin another player would want immediately. Think bold shape, clean team identity, Cooperstown energy, and one unforgettable feature. The best pins are easy to recognize, easy to trade, and impossible to forget.</p>
             </div>
           </div>
           <div className="flex gap-4 items-start">
             <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">2</span>
             <div>
               <p className="text-sp-white font-bold text-base">Cash or Trash</p>
-              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Swipe through everyone&apos;s designs. CASH the pins you&apos;d want to trade. TRASH the ones you wouldn&apos;t. Blind voting — nobody sees the scores.</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Swipe through everyone&apos;s designs. CASH the ones you&apos;d trade for. TRASH the ones you wouldn&apos;t. After a CASH vote, tag WHY you liked it. Blind voting — nobody sees scores.</p>
             </div>
           </div>
           <div className="flex gap-4 items-start">
             <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">3</span>
             <div>
               <p className="text-sp-white font-bold text-base">Winners Get Made</p>
-              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Top-voted designs get manufactured as real trading pins. The best become your Cooperstown collection — a series of 3 collectibles plus a special mid-week drop.</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Top designs across five award categories get manufactured as real trading pins for Cooperstown. The team picks the collection.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== WHAT WE'RE MAKING ===== */}
+      <div className="px-6 max-w-lg mx-auto pb-10">
+        <h2 className="text-sp-white font-bold text-2xl mb-5 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+          WHAT WE&apos;RE MAKING
+        </h2>
+        <div className="flex flex-col gap-3">
+          <div className="bg-charcoal border border-gray-800 rounded-xl p-4 flex gap-4 items-start">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">1</span>
+            <div>
+              <p className="text-sp-white font-bold text-base">The Main Team Trader</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Bold hurricane/baseball hybrid in custom shape with one premium feature. The pin most kids trade first. 1.75-2 inches, soft enamel.</p>
+            </div>
+          </div>
+          <div className="bg-charcoal border border-gray-800 rounded-xl p-4 flex gap-4 items-start">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">2</span>
+            <div>
+              <p className="text-sp-white font-bold text-base">The Cooperstown Pin</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Celebrates the trip itself. Dreams Park entrance, Cooperstown cues, destination badge style. The trip memory pin.</p>
+            </div>
+          </div>
+          <div className="bg-charcoal border border-gray-800 rounded-xl p-4 flex gap-4 items-start">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">3</span>
+            <div>
+              <p className="text-sp-white font-bold text-base">The Team-Insider Pin</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">The weirdest, most &quot;us&quot; concept. The pin the boys love because it feels like theirs. Category 12U energy.</p>
+            </div>
+          </div>
+          <div className="bg-charcoal border border-gray-800 rounded-xl p-4 flex gap-4 items-start">
+            <span className="shrink-0 w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">4</span>
+            <div>
+              <p className="text-sp-white font-bold text-base">The Storm Alert Drop</p>
+              <p className="text-gray-400 text-base leading-relaxed mt-0.5">Limited edition mid-week surprise. Black nickel or gold variant, special finish. You don&apos;t know what it is until you&apos;re there.</p>
             </div>
           </div>
         </div>
@@ -223,6 +260,70 @@ export default async function HomePage() {
             })}
           </div>
 
+          {/* ===== AWARD CATEGORIES ===== */}
+          <div className="mt-8">
+            <h3 className="text-sp-white font-bold text-xl mb-4 text-center" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+              AWARD CATEGORIES
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="bg-black/50 border border-crimson/30 rounded-xl p-3 flex gap-3 items-start">
+                <div className="shrink-0 w-8 h-8 rounded-lg bg-crimson/15 flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C41230" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sp-white font-bold text-sm">Best Overall Trader</p>
+                  <p className="text-gray-400 text-xs leading-relaxed">The pin every kid at Cooperstown wants to trade for.</p>
+                </div>
+              </div>
+              <div className="bg-black/50 border border-crimson/30 rounded-xl p-3 flex gap-3 items-start">
+                <div className="shrink-0 w-8 h-8 rounded-lg bg-crimson/15 flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C41230" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sp-white font-bold text-sm">Most Creative Team Pin</p>
+                  <p className="text-gray-400 text-xs leading-relaxed">Boldest concept that still screams Hurricanes.</p>
+                </div>
+              </div>
+              <div className="bg-black/50 border border-crimson/30 rounded-xl p-3 flex gap-3 items-start">
+                <div className="shrink-0 w-8 h-8 rounded-lg bg-crimson/15 flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C41230" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sp-white font-bold text-sm">Best Cooperstown Spirit</p>
+                  <p className="text-gray-400 text-xs leading-relaxed">Captures the Dreams Park experience perfectly.</p>
+                </div>
+              </div>
+              <div className="bg-black/50 border border-crimson/30 rounded-xl p-3 flex gap-3 items-start">
+                <div className="shrink-0 w-8 h-8 rounded-lg bg-crimson/15 flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C41230" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 2h6l3 7H6L9 2z"/><rect x="4" y="9" width="16" height="13" rx="2"/><line x1="9" y1="14" x2="9" y2="18"/><line x1="15" y1="14" x2="15" y2="18"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sp-white font-bold text-sm">Coach&apos;s Pick</p>
+                  <p className="text-gray-400 text-xs leading-relaxed">The design the coaching staff wants on their lanyard.</p>
+                </div>
+              </div>
+              <div className="bg-black/50 border border-crimson/30 rounded-xl p-3 flex gap-3 items-start sm:col-span-2 sm:max-w-[calc(50%-5px)] sm:mx-auto">
+                <div className="shrink-0 w-8 h-8 rounded-lg bg-crimson/15 flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C41230" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sp-white font-bold text-sm">Secret Drop Winner</p>
+                  <p className="text-gray-400 text-xs leading-relaxed">Mystery limited edition revealed mid-week at Cooperstown.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* CTAs below rankings */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <Link
@@ -231,7 +332,7 @@ export default async function HomePage() {
               style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(196,18,48,0.4)' }}
             >
               <span className="text-lg uppercase tracking-widest">Vote Now</span>
-              <span className="block text-xs text-sp-white/60 uppercase tracking-wider mt-0.5 font-normal">Change the Rankings</span>
+              <span className="block text-xs text-sp-white/60 uppercase tracking-wider mt-0.5 font-normal">Judge the Designs</span>
             </Link>
             <Link
               href={hasSession ? '/design' : '/join'}
@@ -239,7 +340,7 @@ export default async function HomePage() {
               style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}
             >
               <span className="text-lg uppercase tracking-widest text-fire">Design</span>
-              <span className="block text-xs text-gray-400 uppercase tracking-wider mt-0.5 font-normal">Think You Can Do Better? Prove It</span>
+              <span className="block text-xs text-gray-400 uppercase tracking-wider mt-0.5 font-normal">Think You Can Do Better?</span>
             </Link>
           </div>
         </div>

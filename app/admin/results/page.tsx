@@ -112,6 +112,26 @@ export default function ResultsPage() {
                   >
                     {pin.is_winner ? 'WINNER' : 'Pick'}
                   </button>
+                  <select
+                    value={(pin as PinResult & { award_category?: string }).award_category ?? ''}
+                    onChange={async (e) => {
+                      const cat = e.target.value || null;
+                      await fetch(`/api/pins/${pin.id}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ award_category: cat }),
+                      });
+                      setResults(prev => prev.map(p => p.id === pin.id ? { ...p, award_category: cat } as PinResult : p));
+                    }}
+                    className="text-xs bg-black/40 border border-gray-700 text-gray-400 rounded-lg px-2 py-1"
+                  >
+                    <option value="">Category...</option>
+                    <option value="best_trader">Best Trader</option>
+                    <option value="most_creative">Most Creative</option>
+                    <option value="cooperstown_spirit">Cooperstown Spirit</option>
+                    <option value="coaches_pick">Coach Pick</option>
+                    <option value="secret_drop">Storm Drop</option>
+                  </select>
                 </div>
               </div>
             );

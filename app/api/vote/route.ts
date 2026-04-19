@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 });
   }
 
-  const { pin_id, value } = await req.json();
+  const { pin_id, value, reasons } = await req.json();
   if (!pin_id || !['cash', 'trash'].includes(value)) {
     return NextResponse.json({ error: 'Invalid vote' }, { status: 400 });
   }
@@ -16,8 +16,8 @@ export async function POST(req: NextRequest) {
   const pool = getPool();
   try {
     await pool.query(
-      'INSERT INTO votes (player_id, pin_id, value) VALUES ($1, $2, $3)',
-      [playerId, pin_id, value]
+      'INSERT INTO votes (player_id, pin_id, value, reasons) VALUES ($1, $2, $3, $4)',
+      [playerId, pin_id, value, JSON.stringify(reasons ?? [])]
     );
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {

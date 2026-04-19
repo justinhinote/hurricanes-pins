@@ -26,6 +26,10 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [voteCount, setVoteCount] = useState(0);
+  const [showReasons, setShowReasons] = useState(false);
+  const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
+  const [pendingPinId, setPendingPinId] = useState<number | null>(null);
+  const reasonsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startX = useRef(0);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +48,47 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
     return () => document.body.classList.remove('no-overscroll');
   }, [currentPin]);
 
+  const advanceToNext = useCallback(async () => {
+    setVoteCount(prev => prev + 1);
+    if (nextPin) {
+      setCurrentPin(nextPin);
+      setNextPin(null);
+    } else {
+      const res = await fetch('/api/vote/next');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.pin) {
+          setCurrentPin(data.pin);
+        } else {
+          setCurrentPin(null);
+          setDone(true);
+        }
+      } else {
+        setCurrentPin(null);
+        setDone(true);
+      }
+    }
+    setVoting(false);
+  }, [nextPin]);
+
+  const submitReasons = useCallback(async (reasons: string[]) => {
+    if (reasonsTimerRef.current) {
+      clearTimeout(reasonsTimerRef.current);
+      reasonsTimerRef.current = null;
+    }
+    if (pendingPinId && reasons.length > 0) {
+      fetch('/api/vote/reasons', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin_id: pendingPinId, reasons }),
+      }).catch(() => {});
+    }
+    setShowReasons(false);
+    setSelectedReasons([]);
+    setPendingPinId(null);
+    await advanceToNext();
+  }, [pendingPinId, advanceToNext]);
+
   const castVote = useCallback(async (value: 'cash' | 'trash') => {
     if (!currentPin || voting) return;
 
@@ -60,30 +105,22 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
 
     setExitDir(null);
     setDragX(0);
-    setVoteCount(prev => prev + 1);
 
-    if (nextPin) {
-      setCurrentPin(nextPin);
-      setNextPin(null);
+    if (value === 'cash') {
+      setPendingPinId(currentPin.id);
+      setSelectedReasons([]);
+      setShowReasons(true);
+      // Auto-advance after 4 seconds
+      reasonsTimerRef.current = setTimeout(() => {
+        setShowReasons(false);
+        setSelectedReasons([]);
+        setPendingPinId(null);
+        advanceToNext();
+      }, 4000);
     } else {
-      // Check if there really are no more
-      const res = await fetch('/api/vote/next');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.pin) {
-          setCurrentPin(data.pin);
-        } else {
-          setCurrentPin(null);
-          setDone(true);
-        }
-      } else {
-        setCurrentPin(null);
-        setDone(true);
-      }
+      await advanceToNext();
     }
-
-    setVoting(false);
-  }, [currentPin, nextPin, voting]);
+  }, [currentPin, voting, advanceToNext]);
 
   // Touch/mouse drag handlers
   function handlePointerDown(e: React.PointerEvent) {
@@ -239,6 +276,88 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
           </svg>
         </button>
       </div>
+
+      {/* "Why Cash?" quick-tag overlay */}
+      {showReasons && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(0, 0, 0, 0.85)' }}
+        >
+          <div className="flex flex-col items-center gap-5 px-6 w-full max-w-sm">
+            <h2
+              className="text-3xl tracking-wider text-green-500"
+              style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}
+            >
+              WHY CASH?
+            </h2>
+            <p className="text-gray-400 text-sm -mt-2">Tap one or more, or skip</p>
+
+            <div className="grid grid-cols-2 gap-3 w-full">
+              {([
+                { key: 'trade_it', label: 'TRADE IT', desc: 'Other teams would want this', icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                  </svg>
+                )},
+                { key: 'thats_us', label: "THAT'S US", desc: 'Feels like Hurricanes', icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                )},
+                { key: 'clean_design', label: 'CLEAN DESIGN', desc: 'Looks like a real pin', icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                )},
+                { key: 'never_seen_that', label: 'NEVER SEEN THAT', desc: 'Totally original', icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                )},
+              ] as const).map(({ key, label, desc, icon }) => {
+                const isSelected = selectedReasons.includes(key);
+                return (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setSelectedReasons(prev =>
+                        prev.includes(key) ? prev.filter(r => r !== key) : [...prev, key]
+                      );
+                    }}
+                    className="flex flex-col items-center justify-center gap-1.5 rounded-xl px-3 py-4 transition-all"
+                    style={{
+                      background: '#1f1f1f',
+                      border: isSelected ? '2px solid #16a34a' : '2px solid #374151',
+                      color: isSelected ? '#22c55e' : '#9ca3af',
+                    }}
+                  >
+                    <span style={{ color: isSelected ? '#22c55e' : '#6b7280' }}>{icon}</span>
+                    <span
+                      className="text-xs font-bold tracking-wide"
+                      style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', color: isSelected ? '#22c55e' : '#d1d5db' }}
+                    >
+                      {label}
+                    </span>
+                    <span className="text-[10px] leading-tight" style={{ color: '#6b7280' }}>{desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              onClick={() => submitReasons(selectedReasons)}
+              className="w-full rounded-xl py-3 text-white font-bold text-lg tracking-widest uppercase transition-all active:brightness-75"
+              style={{
+                fontFamily: 'var(--font-anton), Impact, sans-serif',
+                background: selectedReasons.length > 0 ? '#16a34a' : '#374151',
+              }}
+            >
+              {selectedReasons.length > 0 ? 'NEXT' : 'SKIP'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
