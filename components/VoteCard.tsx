@@ -198,12 +198,12 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-1.5 text-red-500">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"/></svg>
+            <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"/></svg>
             <span className="font-bold uppercase tracking-wide">Swipe left = Trash</span>
           </div>
           <div className="flex items-center gap-1.5 text-green-500">
             <span className="font-bold uppercase tracking-wide">Swipe right = Cash</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
         </div>
       </div>
@@ -339,7 +339,7 @@ export default function VoteCard({ initialPin, initialDone }: VoteCardProps) {
                     >
                       {label}
                     </span>
-                    <span className="text-[10px] leading-tight" style={{ color: '#6b7280' }}>{desc}</span>
+                    <span className="text-xs leading-snug" style={{ color: '#6b7280' }}>{desc}</span>
                   </button>
                 );
               })}

@@ -148,7 +148,7 @@ export default async function HomePage() {
               <span className="shrink-0 w-8 h-8 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center text-crimson text-sm font-bold">{item.n}</span>
               <div>
                 <p className="text-sp-white font-bold text-base">{item.title}</p>
-                <p className="text-gray-400 text-sm">{item.desc}</p>
+                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
               </div>
             </div>
           ))}
@@ -156,7 +156,7 @@ export default async function HomePage() {
             <span className="shrink-0 w-8 h-8 rounded-full bg-fire/20 border border-fire/40 flex items-center justify-center text-fire text-sm font-bold">+</span>
             <div>
               <p className="text-fire font-bold text-base">The Hurricanes Alert Drop</p>
-              <p className="text-gray-400 text-sm">Mid-week surprise. Limited edition. Nobody sees it coming.</p>
+              <p className="text-gray-400 text-sm leading-relaxed">Mid-week surprise. Limited edition. Nobody sees it coming.</p>
             </div>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default async function HomePage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sp-white text-base truncate">{pin.concept_text}</p>
-                    {pin.creator_name && <p className="text-gray-400 text-sm mt-0.5">by {pin.creator_name}</p>}
+                    {pin.creator_name && <p className="text-gray-400 text-sm mt-0.5 break-words">by {pin.creator_name}</p>}
                   </div>
                 </div>
               );

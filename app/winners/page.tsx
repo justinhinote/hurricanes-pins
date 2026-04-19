@@ -78,7 +78,7 @@ export default async function WinnersPage() {
                     <h2 className="text-sp-white text-xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
                       {cat.title.toUpperCase()}
                     </h2>
-                    <p className="text-gray-400 text-sm mt-0.5">{cat.description}</p>
+                    <p className="text-gray-400 text-sm mt-0.5 leading-relaxed break-words">{cat.description}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {pins.map(pin => (
@@ -126,7 +126,7 @@ export default async function WinnersPage() {
         {/* Production strategy */}
         <div className="mt-12 bg-charcoal/60 border border-gray-800 rounded-2xl p-5">
           <h3 className="text-fire text-sm font-bold uppercase tracking-widest mb-3">The Collection</h3>
-          <div className="flex flex-col gap-3 text-sm">
+          <div className="flex flex-col gap-3 text-sm leading-relaxed">
             <div className="flex gap-3">
               <span className="text-crimson font-bold shrink-0">1.</span>
               <p className="text-gray-300"><span className="text-sp-white font-bold">Main Team Trader</span> — The official team pin built for maximum trade value.</p>

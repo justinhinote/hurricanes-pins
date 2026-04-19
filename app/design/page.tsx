@@ -336,7 +336,7 @@ export default function DesignPage() {
                   </div>
                   <div>
                     <p className="text-sp-white text-sm font-bold">{cat.name}</p>
-                    <p className="text-gray-500 text-xs mt-0.5 leading-snug">{cat.prompt.substring(0, 50)}...</p>
+                    <p className="text-gray-500 text-sm mt-0.5 leading-relaxed break-words">{cat.prompt}</p>
                   </div>
                 </button>
               ))}
