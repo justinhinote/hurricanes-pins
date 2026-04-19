@@ -14,11 +14,7 @@ npm run start    # next start (production server)
 
 There is no test suite and no lint script. Type checking happens during `next build`.
 
-Database setup is one-shot: run `schema.sql` against the Neon database. To re-composite text overlays onto every existing pin (after editing the SVG in `lib/text-overlay.ts`), run:
-
-```bash
-env $(cat .env.local | grep -v "^#" | xargs) node scripts/reprocess-pins.mjs
-```
+Database setup is one-shot: run `schema.sql` against the Neon database.
 
 ## Deploy
 
@@ -54,15 +50,17 @@ Only one round is `active` at a time; activating a round archives any other acti
 
 ### Image generation pipeline (`lib/dalle.ts`)
 
-Provider fallback order: **Google Imagen 3 → OpenAI `gpt-image-1` → DALL-E 3**. Imagen is preferred because it renders text far more accurately. Every prompt has `IMAGE_RULES` appended that forbids text in the image — text is composited later by `lib/text-overlay.ts`.
+Provider fallback order: **Google Imagen 3 → OpenAI `gpt-image-1` → DALL-E 3**. Imagen is preferred because it renders text far more accurately. `generateImage(prompt, pinText?)` builds the rules block dynamically — when `pinText` has content, the model is instructed to render those exact strings on the pin; when it doesn't, the model is forbidden from rendering any text.
 
-### Text overlay (`lib/text-overlay.ts` + `lib/pin-text.ts`)
+### Pin text (`lib/pin-text.ts`)
 
-Sharp + SVG composite. The user (player or admin) controls **up to 3 optional text slots**: `top`, `middle`, `bottom`. All slots are optional — if all are blank the pin has zero text. The top banner renders if either `top` or `middle` is set; the bottom banner renders if `bottom` is set.
+The user (player or admin) controls **up to 3 optional text slots**: `top`, `middle`, `bottom`. All slots are optional — if all are blank the pin has zero text. Per-slot character limits and defaults live in `lib/pin-text.ts` (`PIN_TEXT_LIMITS` = 18/14/18, `PIN_TEXT_DEFAULTS` = `HURRICANES` / `12U SPYA` / `COOPERSTOWN 2026`). `sanitizeLine` runs on every input — uppercases, strips non-renderable chars, collapses whitespace, hard-truncates. Both client and server call it; never trust raw input.
 
-Per-slot character limits and defaults live in `lib/pin-text.ts` (`PIN_TEXT_LIMITS` = 18/14/18, `PIN_TEXT_DEFAULTS` = `HURRICANES` / `12U SPYA` / `COOPERSTOWN 2026`). `sanitizeLine` runs on every input — uppercases, strips non-renderable chars, collapses whitespace, hard-truncates. Both client and server call it; never trust raw input.
+`formatTextInstructions(pinText)` produces the prompt fragment that gets injected into both Claude (when it builds the image prompt) and the image-gen rules block. Because the user typed exact spelling, Imagen 3 can copy it verbatim into the design — the pin text becomes part of the AI render itself, not a post-composite banner.
 
-The AI image prompt continues to forbid all text. Spelling can never be wrong because the user typed it themselves.
+### Image normalization (`lib/text-overlay.ts`)
+
+Despite the historical name, this module no longer composites text. `addTextOverlay(image)` simply normalizes the AI image to a 1024x1024 PNG with a white background — the text is already baked in by the image model.
 
 ### Preference engine (`lib/preference-engine.ts` + `/api/analyze`)
 
@@ -88,7 +86,7 @@ Tailwind CSS v4 via `@import "tailwindcss"` in `app/globals.css`. Custom theme t
 
 ## Conventions to honor
 
-- **No text in AI-generated images.** All on-pin typography is user-typed and composited via the SVG overlay (`lib/text-overlay.ts`). Concept prompts and player prompts both forbid text in the image — don't reintroduce it.
+- **Text on pins is AI-rendered from user-typed strings.** The three pin text slots are passed to the image model with explicit "render exactly these letters, do not invent additional words" instructions. Do NOT re-introduce post-composite SVG banners — they look pasted on. If the AI misspells, the user re-rolls.
 - **Year is 2026** everywhere (Cooperstown trip year). Earlier commits had to fix `2025` slipping into prompts; keep new prompts on 2026.
 - **Pin shape variety.** The Claude system prompt explicitly demands different shapes across concepts. Don't add a shape constraint that collapses them all to circles.
 - **No emojis** in code, copy, or commits (project-wide rule).

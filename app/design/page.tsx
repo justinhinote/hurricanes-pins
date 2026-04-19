@@ -45,16 +45,23 @@ const REFINE_CHIPS = [
   'Add a Cooperstown charm',
 ];
 
-// Auto-expanding textarea hook
+// Auto-expanding textarea hook. Resizes whenever the value changes AND
+// whenever the textarea attaches to the DOM (so a textarea that mounts
+// already populated still grows to fit its content).
 function useAutoResize(value: string) {
-  const ref = useRef<HTMLTextAreaElement>(null);
+  const ref = useRef<HTMLTextAreaElement | null>(null);
+  const fit = (el: HTMLTextAreaElement) => {
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 600)}px`;
+  };
+  const setRef = useCallback((node: HTMLTextAreaElement | null) => {
+    ref.current = node;
+    if (node) fit(node);
+  }, []);
   useEffect(() => {
-    if (ref.current) {
-      ref.current.style.height = 'auto';
-      ref.current.style.height = `${Math.min(ref.current.scrollHeight, 200)}px`;
-    }
+    if (ref.current) fit(ref.current);
   }, [value]);
-  return ref;
+  return { setRef, ref };
 }
 
 export default function DesignPage() {
@@ -142,7 +149,7 @@ export default function DesignPage() {
 
   function handleRefine(chip: string) {
     setDescription(chip);
-    refineRef.current?.focus();
+    refineRef.ref.current?.focus();
   }
 
   function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -175,7 +182,7 @@ export default function DesignPage() {
 
   function handleStylePick(template: typeof STYLE_TEMPLATES[0]) {
     setDescription(template.prompt);
-    textareaRef.current?.focus();
+    textareaRef.ref.current?.focus();
   }
 
   function handleFormSubmit(e: React.FormEvent) {
@@ -262,13 +269,13 @@ export default function DesignPage() {
 
               <form onSubmit={handleFormSubmit} className="flex gap-2 items-end">
                 <textarea
-                  ref={refineRef}
+                  ref={refineRef.setRef}
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Change the colors, add text, make it bigger..."
                   disabled={generating}
-                  rows={1}
+                  rows={2}
                   className="flex-1 bg-black/40 border border-gray-700 text-sp-white text-base px-4 py-3 rounded-2xl focus:outline-none focus:border-crimson placeholder-gray-500 disabled:opacity-50 resize-none overflow-hidden"
                 />
                 <button
@@ -376,7 +383,7 @@ export default function DesignPage() {
 
             <form onSubmit={handleFormSubmit} className="flex flex-col gap-3 mb-4">
               <textarea
-                ref={textareaRef}
+                ref={textareaRef.setRef}
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -449,7 +456,7 @@ export default function DesignPage() {
               ].map(cat => (
                 <button
                   key={cat.name}
-                  onClick={() => { setDescription(cat.prompt); textareaRef.current?.focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => { setDescription(cat.prompt); textareaRef.ref.current?.focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className="flex items-center gap-3 bg-charcoal border border-gray-800 rounded-xl p-3.5 hover:border-crimson/50 active:scale-[0.98] transition-all text-left group"
                 >
                   <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all" style={{ background: `${cat.color}15`, border: `1.5px solid ${cat.color}40` }}>

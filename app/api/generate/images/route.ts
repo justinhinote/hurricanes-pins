@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
 
   for (const concept of concepts) {
     try {
-      // Generate image
-      const imageSource = await generateImage(concept.dalle_prompt);
+      // Generate image — pass pinText so the AI bakes text into the design
+      const imageSource = await generateImage(concept.dalle_prompt, pinText);
       const filename = `pins/${round_id}/${Date.now()}.png`;
       const { url, pathname } = await uploadImage(imageSource, filename, pinText);
 

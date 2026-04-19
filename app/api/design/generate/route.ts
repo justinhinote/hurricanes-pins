@@ -3,7 +3,7 @@ import { getPool } from '@/lib/db';
 import { getPlayerSession } from '@/app/api/lib/auth';
 import { generateImage } from '@/lib/dalle';
 import { uploadImage } from '@/lib/upload-image';
-import { sanitizePinText } from '@/lib/pin-text';
+import { sanitizePinText, formatTextInstructions, hasAnyText } from '@/lib/pin-text';
 import Anthropic from '@anthropic-ai/sdk';
 
 // No attempt limit — let the boys cook
@@ -26,8 +26,10 @@ export async function POST(req: NextRequest) {
   const { description, edit_of, photo, text } = body;
   // edit_of: if provided, this is a free refinement (no attempt cost)
   // photo: optional base64 image data for vision-based design
-  // text: optional { top, middle, bottom } strings composited via SVG (NOT into the image)
+  // text: optional { top, middle, bottom } strings — passed to the AI to render
+  // directly onto the pin (the user typed exact spelling, so the model copies)
   const pinText = sanitizePinText(text);
+  const textBlock = hasAnyText(pinText) ? `\n\n${formatTextInstructions(pinText)}` : '';
 
   if (!description?.trim() && !photo) {
     return NextResponse.json({ error: 'Describe your pin idea or upload a photo' }, { status: 400 });
@@ -95,15 +97,15 @@ PIN DESIGN PRINCIPLES (optimized for real Cooperstown trading):
 
 IMAGE RULES:
 - The prompt MUST describe exactly ONE single pin design, not multiple pins or a collection
-- Do NOT include any words, letters, numbers, or typography — ZERO text in the image
-- The design is purely visual: shapes, colors, effects, composition only
-- Text ("South Park Hurricanes", "Cooperstown 2026", etc.) will be composited onto the image separately
+- The design is purely visual: shapes, colors, effects, composition
 - Describe the pin centered on a clean white background, filling most of the frame
+- If the user provided pin text (see TEXT ON THE PIN below), describe WHERE on the pin the text sits (curved banner, ribbon, raised metal letters across an enamel field) and pass the EXACT spelling through verbatim — do not paraphrase or invent additional words
+- If no pin text is provided, the design must contain ZERO words, letters, or numbers
 
 Return ONLY a JSON object: {"image_prompt": "...", "tags": ["...", "..."]}. No markdown.`,
     messages: [{
       role: 'user',
-      content: `Pin idea: "${promptInput}"${editContext}
+      content: `Pin idea: "${promptInput}"${editContext}${textBlock}
 
 Create an image generation prompt. Specify: pin shape (vary it), enamel pin style, team colors, the visual idea, and any text EXACTLY as it should appear. White/clean background.`
     }]
@@ -121,10 +123,13 @@ Create an image generation prompt. Specify: pin shape (vary it), enamel pin styl
     tags = ['hurricanes', 'baseball', 'cooperstown', 'crimson', 'enamel'];
   }
 
-  // Generate image
-  const imageSource = await generateImage(imagePrompt);
+  // Generate image — pass the user-typed text so the model bakes it into the
+  // pin design itself (no more SVG banners pasted on top).
+  const imageSource = await generateImage(imagePrompt, pinText);
 
-  // Upload to Vercel Blob (permanent URL)
+  // Upload to Vercel Blob (permanent URL). uploadImage normalizes the image
+  // to 1024x1024 white background — the text param is now a no-op since the
+  // AI already baked text into the render.
   const filename = `pins/${roundId}/draft-${playerId}-${Date.now()}.png`;
   const { url, pathname } = await uploadImage(imageSource, filename, pinText);
 
