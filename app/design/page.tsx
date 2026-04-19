@@ -177,24 +177,28 @@ export default function DesignPage() {
     <div className="min-h-screen flex flex-col" style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0D0000 70%)' }}>
       <PlayerNav />
 
-      {/* Header */}
-      <div className="px-5 pt-6 pb-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-sp-white text-xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
-            DESIGN YOUR PIN
-          </h1>
-          <p className="text-gray-600 text-xs">Best designs get made into real trading pins</p>
-        </div>
-        {attemptsRemaining !== null && (
-          <div className="flex items-center gap-1.5">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className={`w-2.5 h-2.5 rounded-full ${i < (5 - attemptsRemaining) ? 'bg-crimson' : 'bg-gray-700'}`}
-              />
-            ))}
+      {/* Header with logo */}
+      <div className="px-5 pt-5 pb-2">
+        <div className="flex items-center gap-3">
+          <Image src="/logo.svg" alt="SP" width={36} height={40} />
+          <div className="flex-1">
+            <h1 className="text-sp-white text-lg font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+              DESIGN YOUR PIN
+            </h1>
+            <p className="text-gray-600 text-xs">Best designs get made into real trading pins</p>
           </div>
-        )}
+          {attemptsRemaining !== null && (
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-2 h-2 rounded-full ${i < (5 - attemptsRemaining) ? 'bg-crimson' : 'bg-gray-700'}`}
+                />
+              ))}
+              <span className="text-gray-600 text-[10px] ml-1">{attemptsRemaining}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Chat area */}
@@ -202,17 +206,32 @@ export default function DesignPage() {
 
         {/* Style picker - shown at start */}
         {showStylePicker && (
-          <div className="mb-5">
-            <p className="text-gray-500 text-xs uppercase font-bold tracking-wider mb-3 px-1">Pick a style to start</p>
+          <div className="mb-4">
+            {/* Intro card */}
+            <div className="bg-charcoal/60 border border-gray-800 rounded-2xl p-4 mb-4">
+              <div className="flex gap-3 items-start">
+                <div className="shrink-0 w-10 h-10 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C41230" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sp-white text-sm font-bold">Describe your dream pin</p>
+                  <p className="text-gray-500 text-xs mt-1 leading-relaxed">Pick a style below or type your own idea. Spinners, oversized shapes, glow effects — the crazier the better for Cooperstown trading.</p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-2.5 px-1">Pick a style</p>
             <div className="grid grid-cols-4 gap-2">
               {STYLE_TEMPLATES.map(t => (
                 <button
                   key={t.name}
                   onClick={() => handleStylePick(t)}
-                  className="flex flex-col items-center gap-1.5 bg-charcoal border border-gray-800 rounded-xl p-2.5 hover:border-crimson/50 active:scale-95 transition-all"
+                  className="flex flex-col items-center gap-1.5 bg-charcoal border border-gray-800 rounded-xl p-2.5 hover:border-crimson/50 active:scale-95 transition-all group"
                 >
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: `${t.color}20`, border: `2px solid ${t.color}40` }}>
-                    <div className="w-4 h-4 rounded-full" style={{ background: t.color }} />
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-all group-hover:scale-110" style={{ background: `${t.color}15`, border: `1.5px solid ${t.color}35` }}>
+                    <div className="w-5 h-5 rounded-full" style={{ background: `${t.color}`, boxShadow: `0 0 8px ${t.color}40` }} />
                   </div>
                   <span className="text-sp-white text-[10px] font-bold leading-tight text-center">{t.name}</span>
                 </button>
@@ -266,13 +285,18 @@ export default function DesignPage() {
             return null;
           })}
 
-          {/* Generating spinner */}
+          {/* Generating spinner — visual progress */}
           {generating && (
             <div className="flex justify-start">
-              <div className="bg-charcoal rounded-2xl rounded-bl-sm px-5 py-4 border border-gray-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 border-2 border-fire border-t-transparent rounded-full animate-spin"/>
-                  <span className="text-gray-400 text-sm">Drawing your pin...</span>
+              <div className="bg-charcoal rounded-2xl rounded-bl-sm border border-crimson/20 overflow-hidden max-w-[85%]" style={{ boxShadow: '0 0 24px rgba(255,85,0,0.1)' }}>
+                {/* Animated placeholder */}
+                <div className="w-64 h-64 sm:w-72 sm:h-72 flex flex-col items-center justify-center gap-4 relative">
+                  <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, rgba(196,18,48,0.08) 0%, transparent 70%)' }}/>
+                  <div className="w-12 h-12 border-3 border-fire border-t-transparent rounded-full animate-spin"/>
+                  <div className="text-center">
+                    <p className="text-sp-white text-sm font-bold">Creating your pin...</p>
+                    <p className="text-gray-600 text-xs mt-1">AI is drawing your design (~30s)</p>
+                  </div>
                 </div>
               </div>
             </div>

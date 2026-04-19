@@ -60,24 +60,25 @@ export default async function HomePage() {
     <div className="min-h-screen bg-black">
 
       {/* ===== HERO SECTION with team photo ===== */}
-      <div className="relative overflow-hidden" style={{ minHeight: '420px' }}>
-        {/* Team photo background with slow zoom */}
+      <div className="relative overflow-hidden min-h-[420px] sm:min-h-[520px] lg:min-h-[600px]">
+        {/* Team photo background with slow zoom — object-[center_30%] keeps faces visible on all screens */}
         <div className="absolute inset-0">
           <Image
             src="/team-photo.png"
             alt="South Park Hurricanes 12U"
             fill
-            className="object-cover object-top animate-slow-zoom"
+            className="object-cover animate-slow-zoom"
+            style={{ objectPosition: 'center 30%' }}
             priority
             sizes="100vw"
           />
         </div>
 
-        {/* Dark vignette overlay */}
+        {/* Dark vignette overlay — heavier on bottom for text readability */}
         <div
           className="absolute inset-0 hero-vignette"
           style={{
-            background: 'linear-gradient(to bottom, rgba(13,0,0,0.3) 0%, rgba(13,0,0,0.1) 30%, rgba(13,0,0,0.5) 70%, rgba(13,0,0,1) 100%), radial-gradient(ellipse at center, transparent 30%, rgba(13,0,0,0.7) 100%)',
+            background: 'linear-gradient(to bottom, rgba(13,0,0,0.4) 0%, rgba(13,0,0,0.15) 25%, rgba(13,0,0,0.15) 45%, rgba(13,0,0,0.6) 70%, rgba(13,0,0,1) 95%), radial-gradient(ellipse at center, transparent 40%, rgba(13,0,0,0.6) 100%)',
           }}
         />
 
@@ -89,8 +90,8 @@ export default async function HomePage() {
           <polyline points="12,0 26,32 18,32 32,80" stroke="#FF5500" strokeWidth="2.5" strokeLinejoin="round" opacity="0.8"/>
         </svg>
 
-        {/* Hero content */}
-        <div className="relative z-10 flex flex-col items-center justify-end px-6 pb-8 pt-48 sm:pt-56">
+        {/* Hero content — pushed to bottom so team photo stays visible */}
+        <div className="relative z-10 flex flex-col items-center justify-end px-6 pb-8 pt-52 sm:pt-72 lg:pt-96">
           {/* SP Logo */}
           <div className="animate-logo-glow mb-4">
             <Image src="/logo.svg" alt="SP Hurricanes" width={90} height={100} priority />
