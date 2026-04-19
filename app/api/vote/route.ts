@@ -15,9 +15,12 @@ export async function POST(req: NextRequest) {
 
   const pool = getPool();
   try {
+    // `reasons` is a Postgres TEXT[]. Pass the JS array directly — pg maps it
+    // to a native array. JSON.stringify would give `"[]"` which Postgres can't
+    // parse as an array literal and every vote would 500.
     await pool.query(
       'INSERT INTO votes (player_id, pin_id, value, reasons) VALUES ($1, $2, $3, $4)',
-      [playerId, pin_id, value, JSON.stringify(reasons ?? [])]
+      [playerId, pin_id, value, Array.isArray(reasons) ? reasons : []]
     );
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {

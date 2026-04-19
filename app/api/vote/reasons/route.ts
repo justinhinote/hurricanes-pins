@@ -14,9 +14,12 @@ export async function PATCH(req: NextRequest) {
   }
 
   const pool = getPool();
+  // reasons is a Postgres TEXT[] — pass the JS array directly so pg maps it
+  // to a native array. JSON.stringify would give `"[]"` which Postgres can't
+  // parse as an array literal.
   const result = await pool.query(
     'UPDATE votes SET reasons = $1 WHERE player_id = $2 AND pin_id = $3',
-    [JSON.stringify(reasons), playerId, pin_id]
+    [reasons, playerId, pin_id]
   );
 
   if (result.rowCount === 0) {
