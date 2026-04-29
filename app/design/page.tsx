@@ -46,7 +46,11 @@ const REFINE_CHIPS = [
   'Add a Cooperstown charm',
 ];
 
+type Mode = 'ai' | 'upload';
+
 export default function DesignPage() {
+  const [mode, setMode] = useState<Mode>('ai');
+  const [showIdeas, setShowIdeas] = useState(false);
   const [description, setDescription] = useState('');
   const [generating, setGenerating] = useState(false);
   const [draft, setDraft] = useState<DraftPin | null>(null);
@@ -253,19 +257,11 @@ export default function DesignPage() {
       <PlayerNav />
 
       {/* Header */}
-      <div className="px-5 pt-5 pb-3">
-        <div className="flex items-center gap-3">
-          <span className="text-crimson text-2xl font-bold shrink-0" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>SP</span>
-          <div className="flex-1">
-            <h1 className="text-sp-white text-2xl font-bold" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
-              DESIGN YOUR PIN
-            </h1>
-            <p className="text-gray-400 text-base">Best designs get made into real trading pins</p>
-          </div>
-          {submittedPins.length > 0 && (
-            <span className="text-fire text-base font-bold">{submittedPins.length} submitted</span>
-          )}
-        </div>
+      <div className="px-5 pt-6 pb-4 max-w-md mx-auto w-full">
+        <h1 className="text-sp-white text-3xl font-bold tracking-wide" style={{ fontFamily: 'var(--font-anton), Impact, sans-serif' }}>
+          DESIGN YOUR PIN
+        </h1>
+        <p className="text-gray-400 text-lg mt-1">Best ones get made for Cooperstown</p>
       </div>
 
       {/* Main content area */}
@@ -376,239 +372,205 @@ export default function DesignPage() {
 
         {/* === DESIGN INPUT (no draft, not generating) === */}
         {!draft && !generating && !justSubmitted && (
-          <div>
-            {/* Submitted pins gallery */}
+          <div className="max-w-md mx-auto w-full">
+            {/* Submitted pins gallery — compact */}
             {submittedPins.length > 0 && (
-              <div className="mb-5">
-                <p className="text-fire text-base font-bold uppercase tracking-wide mb-2">Your Submissions ({submittedPins.length})</p>
-                <div className="flex gap-3 overflow-x-auto pb-2">
+              <div className="mb-6">
+                <p className="text-gray-400 text-lg mb-2">Your submissions</p>
+                <div className="flex gap-2 overflow-x-auto pb-1">
                   {submittedPins.map(pin => (
-                    <div key={pin.id} className="shrink-0 w-24">
-                      <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-crimson/30"
-                        style={{ boxShadow: '0 0 10px rgba(255,85,0,0.15)' }}>
-                        <Image src={pin.image_url} alt={pin.concept_text} fill className="object-contain" sizes="96px" />
-                      </div>
+                    <div key={pin.id} className="relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-gray-800">
+                      <Image src={pin.image_url} alt={pin.concept_text} fill className="object-contain" sizes="80px" />
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Quick brief — kid-friendly */}
-            <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-4 mb-5">
-              <p className="text-sp-white text-base leading-relaxed">Design a pin kids from other teams would trade for. Think Hurricanes + baseball. One bold shape, one cool feature. That&apos;s it.</p>
-            </div>
-
-            {/* Pin text fields */}
-            <p className="text-sp-white text-lg font-bold mb-1">Pin Text</p>
-            <p className="text-gray-400 text-base mb-3">All optional. Leave blank for a text-free pin. The AI bakes whatever you type into the design itself.</p>
-            <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-3 mb-5 flex flex-col gap-2.5">
-              {(['top', 'middle', 'bottom'] as const).map(slot => {
-                const labels = { top: 'Top', middle: 'Middle', bottom: 'Bottom' };
-                const value = pinText[slot] ?? '';
-                const max = PIN_TEXT_LIMITS[slot];
-                return (
-                  <div key={slot}>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-gray-400 text-base font-bold uppercase tracking-wider">{labels[slot]}</label>
-                      <span className={`text-base ${value.length >= max ? 'text-fire' : 'text-gray-500'}`}>{value.length}/{max}</span>
-                    </div>
-                    <input
-                      type="text"
-                      value={value}
-                      maxLength={max}
-                      onChange={e => updateTextSlot(slot, e.target.value)}
-                      placeholder={`Optional · max ${max} chars`}
-                      className="w-full bg-black/40 border border-gray-700 text-sp-white text-base px-3 py-2.5 rounded-lg focus:outline-none focus:border-crimson placeholder-gray-600 uppercase tracking-wide"
-                      style={{ textTransform: 'uppercase' }}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Describe your pin */}
-            <p className="text-sp-white text-lg font-bold mb-2">Describe Your Pin</p>
-            <p className="text-gray-400 text-base mb-3">Type your idea. Keep it simple — the AI handles the details.</p>
-
-            <form onSubmit={handleFormSubmit} className="flex flex-col gap-3 mb-4">
-              <textarea
-                ref={textareaRef.setRef}
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Example: A baseball in the eye of the Hurricanes with lightning..."
-                rows={2}
-                className="w-full bg-charcoal border border-gray-700 text-sp-white text-base px-4 py-3 rounded-xl focus:outline-none focus:border-crimson placeholder-gray-500 resize-none overflow-hidden"
-              />
-
-              {/* Photo upload */}
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 bg-charcoal border border-gray-700 text-gray-400 px-4 py-3 rounded-xl hover:border-crimson/50 active:scale-95 transition-all text-base"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                  </svg>
-                  {photoData ? 'Photo attached' : 'Upload a photo or design file for context'}
-                </button>
-                {photoData && (
-                  <button type="button" onClick={() => setPhotoData(null)} className="text-gray-500 text-base hover:text-fire">Remove</button>
-                )}
-              </div>
-
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={handlePhotoSelect}
-              />
-
-              {error && <p className="text-fire text-base">{error}</p>}
-
+            {/* Mode toggle */}
+            <div className="flex gap-2 p-1 bg-charcoal rounded-xl mb-6 border border-gray-800">
               <button
-                type="submit"
-                disabled={!description.trim() && !photoData}
-                className="w-full bg-crimson text-sp-white font-bold text-lg py-4 rounded-xl uppercase tracking-widest disabled:opacity-40 active:scale-95 transition-all"
-                style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(196,18,48,0.4)' }}
+                onClick={() => setMode('ai')}
+                className={`flex-1 py-3 rounded-lg text-lg font-bold transition-all ${mode === 'ai' ? 'bg-crimson text-sp-white' : 'text-gray-400'}`}
               >
-                Generate My Pin
+                Generate with AI
               </button>
-            </form>
-
-            {/* Tips */}
-            <div className="bg-charcoal/40 border border-gray-800 rounded-xl p-3 mb-12">
-              <p className="text-gray-400 text-base leading-relaxed">
-                <span className="text-sp-white font-bold">Tip:</span> Bold shape, one wow feature (spinner, dangler, glitter, or glow). Pick one — five stacked together looks busy.
-              </p>
+              <button
+                onClick={() => setMode('upload')}
+                className={`flex-1 py-3 rounded-lg text-lg font-bold transition-all ${mode === 'upload' ? 'bg-crimson text-sp-white' : 'text-gray-400'}`}
+              >
+                Upload my own
+              </button>
             </div>
 
-            {/* Upload your own original design */}
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex-1 h-px bg-gray-800"/>
-                <span className="text-gray-500 text-base uppercase tracking-widest">or</span>
-                <div className="flex-1 h-px bg-gray-800"/>
-              </div>
+            {/* === AI MODE === */}
+            {mode === 'ai' && (
+              <form onSubmit={handleFormSubmit} className="flex flex-col gap-5">
+                {/* Describe */}
+                <div>
+                  <label className="block text-sp-white text-xl font-bold mb-2">Describe your pin</label>
+                  <textarea
+                    ref={textareaRef.setRef}
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="A baseball in the eye of a hurricane with lightning..."
+                    rows={3}
+                    className="w-full bg-charcoal border border-gray-700 text-sp-white text-lg px-4 py-3 rounded-xl focus:outline-none focus:border-crimson placeholder-gray-500 resize-none overflow-hidden"
+                  />
+                </div>
 
-              <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-4">
-                <p className="text-sp-white text-lg font-bold mb-1">Upload Your Own Design</p>
-                <p className="text-gray-400 text-base mb-3">Drew, painted, or designed something yourself? Upload it straight to the contest. No AI step.</p>
+                {/* Pin text */}
+                <div>
+                  <label className="block text-sp-white text-xl font-bold mb-1">Pin text</label>
+                  <p className="text-gray-400 text-base mb-2">Optional. The AI bakes it into the design.</p>
+                  <div className="flex flex-col gap-2">
+                    {(['top', 'middle', 'bottom'] as const).map(slot => {
+                      const labels = { top: 'Top', middle: 'Middle', bottom: 'Bottom' };
+                      const value = pinText[slot] ?? '';
+                      const max = PIN_TEXT_LIMITS[slot];
+                      return (
+                        <input
+                          key={slot}
+                          type="text"
+                          value={value}
+                          maxLength={max}
+                          onChange={e => updateTextSlot(slot, e.target.value)}
+                          placeholder={labels[slot]}
+                          className="w-full bg-charcoal border border-gray-700 text-sp-white text-lg px-4 py-3 rounded-xl focus:outline-none focus:border-crimson placeholder-gray-500 uppercase"
+                          style={{ textTransform: 'uppercase' }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
 
-                <form onSubmit={handleUploadSubmit} className="flex flex-col gap-3">
-                  {!uploadPreview && (
-                    <button
-                      type="button"
-                      onClick={() => uploadRef.current?.click()}
-                      className="w-full bg-black/40 border-2 border-dashed border-gray-700 text-gray-400 px-4 py-8 rounded-xl hover:border-crimson/60 hover:text-sp-white active:scale-95 transition-all flex flex-col items-center gap-2"
-                    >
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-                      </svg>
-                      <span className="text-base font-bold">Choose an image</span>
-                      <span className="text-base text-gray-500">PNG, JPG, or HEIC</span>
-                    </button>
-                  )}
-
-                  {uploadPreview && (
-                    <div className="flex flex-col gap-2">
-                      <div className="relative w-full max-w-sm mx-auto aspect-square rounded-2xl overflow-hidden border-2 border-crimson/40 bg-white"
-                        style={{ boxShadow: '0 0 30px rgba(255,85,0,0.15)' }}>
-                        <Image src={uploadPreview} alt="Your uploaded design" fill className="object-contain" sizes="380px" unoptimized />
-                      </div>
-                      <button type="button" onClick={clearUpload} className="text-base text-gray-400 hover:text-fire self-center">Remove</button>
-                    </div>
-                  )}
-
+                {/* Optional photo */}
+                <div>
                   <input
-                    ref={uploadRef}
+                    ref={fileRef}
                     type="file"
                     accept="image/*"
+                    capture="environment"
                     className="hidden"
-                    onChange={handleUploadSelect}
+                    onChange={handlePhotoSelect}
                   />
-
-                  {uploadPreview && (
-                    <>
-                      <div>
-                        <label className="text-gray-400 text-base font-bold uppercase tracking-wider block mb-1">Description</label>
-                        <input
-                          type="text"
-                          value={uploadConcept}
-                          onChange={e => setUploadConcept(e.target.value.slice(0, 140))}
-                          placeholder="What is your design? (e.g. 'Hurricanes lightning baseball')"
-                          maxLength={140}
-                          className="w-full bg-black/40 border border-gray-700 text-sp-white text-base px-3 py-3 rounded-lg focus:outline-none focus:border-crimson placeholder-gray-500"
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={!uploadConcept.trim() || uploading}
-                        className="w-full bg-green-600 text-white font-bold text-lg py-4 rounded-xl uppercase tracking-widest disabled:opacity-40 active:scale-95 transition-all"
-                        style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(34,197,94,0.3)' }}
-                      >
-                        {uploading ? 'Submitting...' : 'Submit My Design'}
-                      </button>
-                    </>
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="w-full flex items-center justify-center gap-2 bg-charcoal border border-gray-700 text-gray-300 px-4 py-3 rounded-xl text-lg active:scale-95 transition-all"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    {photoData ? 'Photo attached — tap to replace' : 'Add a reference photo'}
+                  </button>
+                  {photoData && (
+                    <button type="button" onClick={() => setPhotoData(null)} className="block mt-2 mx-auto text-base text-gray-400">Remove photo</button>
                   )}
-                </form>
-              </div>
-            </div>
+                </div>
 
-            {/* Template helpers — appear AFTER the design dialogue so the
-                primary path is the text fields + describe + generate. */}
-            <div className="mb-3">
-              <p className="text-sp-white text-base font-bold">Not that creative? Don&apos;t worry about it...</p>
-              <p className="text-gray-400 text-base mt-1 leading-relaxed">Pick one of the templates below and it will prefill an AI-powered pin description for you to play with or adjust.</p>
-            </div>
+                {error && <p className="text-fire text-lg text-center">{error}</p>}
 
-            {/* Award categories as design prompts */}
-            <p className="text-sp-white text-base font-bold mt-4 mb-2">Design for an Award</p>
-            <div className="grid grid-cols-1 gap-2 mb-5">
-              {[
-                { name: 'Best Trader', prompt: 'Design the pin everyone at Cooperstown fights over. Bold shape, clean look, impossible to pass up in a trade.', color: '#FFD700', icon: 'M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3' },
-                { name: 'Most Creative', prompt: 'Make something nobody has ever seen on a pin before. Surprise everyone. Go weird.', color: '#FF5500', icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z' },
-                { name: 'Cooperstown Spirit', prompt: 'Capture the Cooperstown Dreams Park experience. The trip, the fields, the feeling of being there.', color: '#4488FF', icon: 'M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4' },
-                { name: "Coach's Pick", prompt: 'Design the pin the coaches would want on their lanyard. Clean, tough, represents the team.', color: '#C41230', icon: 'M9 2h6l3 7H6L9 2zM4 9h16v13H4z' },
-                { name: 'Secret Drop', prompt: 'Design the mystery limited-edition surprise pin. Something rare, something special, something nobody expects.', color: '#22FF66', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8' },
-              ].map(cat => (
                 <button
-                  key={cat.name}
-                  onClick={() => { setDescription(cat.prompt); textareaRef.ref.current?.focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  className="flex items-center gap-3 bg-charcoal border border-gray-800 rounded-xl p-3.5 hover:border-crimson/50 active:scale-[0.98] transition-all text-left group"
+                  type="submit"
+                  disabled={!description.trim() && !photoData}
+                  className="w-full bg-crimson text-sp-white font-bold text-xl py-5 rounded-xl uppercase tracking-widest disabled:opacity-40 active:scale-95 transition-all"
+                  style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(196,18,48,0.4)' }}
                 >
-                  <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all" style={{ background: `${cat.color}15`, border: `1.5px solid ${cat.color}40` }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={cat.icon}/></svg>
-                  </div>
-                  <div>
-                    <p className="text-sp-white text-base font-bold">{cat.name}</p>
-                    <p className="text-gray-500 text-base mt-0.5 leading-relaxed break-words">{cat.prompt}</p>
-                  </div>
+                  Generate my pin
                 </button>
-              ))}
-            </div>
 
-            {/* Style templates */}
-            <p className="text-sp-white text-base font-bold mb-2">Pick a Style</p>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {STYLE_TEMPLATES.map(t => (
+                {/* Need ideas? — collapsible */}
                 <button
-                  key={t.name}
-                  onClick={() => { handleStylePick(t); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  className="flex items-center gap-2.5 bg-charcoal border border-gray-800 rounded-xl p-3 hover:border-crimson/50 active:scale-95 transition-all text-left group"
+                  type="button"
+                  onClick={() => setShowIdeas(s => !s)}
+                  className="text-gray-400 text-lg py-2 active:text-sp-white transition-colors flex items-center justify-center gap-2"
                 >
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-all" style={{ background: `${t.color}15`, border: `1.5px solid ${t.color}35` }}>
-                    <div className="w-3 h-3 rounded-full" style={{ background: t.color }}/>
-                  </div>
-                  <span className="text-sp-white text-base font-bold leading-tight">{t.name}</span>
+                  {showIdeas ? 'Hide ideas' : 'Need ideas?'}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showIdeas ? 'rotate(180deg)' : 'none' }}>
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
                 </button>
-              ))}
-            </div>
+
+                {showIdeas && (
+                  <div className="flex flex-col gap-2 animate-fade-in">
+                    {STYLE_TEMPLATES.map(t => (
+                      <button
+                        key={t.name}
+                        type="button"
+                        onClick={() => { handleStylePick(t); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className="flex items-center gap-3 bg-charcoal border border-gray-800 rounded-xl px-4 py-3 active:scale-[0.98] transition-all text-left"
+                      >
+                        <div className="w-4 h-4 rounded-full shrink-0" style={{ background: t.color }}/>
+                        <span className="text-sp-white text-lg font-bold">{t.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </form>
+            )}
+
+            {/* === UPLOAD MODE === */}
+            {mode === 'upload' && (
+              <form onSubmit={handleUploadSubmit} className="flex flex-col gap-5">
+                <input
+                  ref={uploadRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleUploadSelect}
+                />
+
+                {!uploadPreview && (
+                  <button
+                    type="button"
+                    onClick={() => uploadRef.current?.click()}
+                    className="w-full bg-charcoal border-2 border-dashed border-gray-700 text-gray-300 px-4 py-12 rounded-xl active:scale-95 transition-all flex flex-col items-center gap-3"
+                  >
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span className="text-xl font-bold">Choose an image</span>
+                    <span className="text-base text-gray-500">PNG, JPG, or HEIC</span>
+                  </button>
+                )}
+
+                {uploadPreview && (
+                  <>
+                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-crimson/40 bg-white">
+                      <Image src={uploadPreview} alt="Your design" fill className="object-contain" sizes="500px" unoptimized />
+                    </div>
+                    <button type="button" onClick={clearUpload} className="text-gray-400 text-lg active:text-fire self-center">
+                      Choose a different image
+                    </button>
+
+                    <div>
+                      <label className="block text-sp-white text-xl font-bold mb-2">What is it?</label>
+                      <input
+                        type="text"
+                        value={uploadConcept}
+                        onChange={e => setUploadConcept(e.target.value.slice(0, 140))}
+                        placeholder="Hurricanes lightning baseball"
+                        maxLength={140}
+                        className="w-full bg-charcoal border border-gray-700 text-sp-white text-lg px-4 py-3 rounded-xl focus:outline-none focus:border-crimson placeholder-gray-500"
+                      />
+                    </div>
+
+                    {error && <p className="text-fire text-lg text-center">{error}</p>}
+
+                    <button
+                      type="submit"
+                      disabled={!uploadConcept.trim() || uploading}
+                      className="w-full bg-green-600 text-white font-bold text-xl py-5 rounded-xl uppercase tracking-widest disabled:opacity-40 active:scale-95 transition-all"
+                      style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(34,197,94,0.3)' }}
+                    >
+                      {uploading ? 'Submitting...' : 'Submit my design'}
+                    </button>
+                  </>
+                )}
+              </form>
+            )}
           </div>
         )}
       </div>
