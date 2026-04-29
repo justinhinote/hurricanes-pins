@@ -55,6 +55,10 @@ export default function DesignPage() {
   const [justSubmitted, setJustSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [photoData, setPhotoData] = useState<string | null>(null);
+  const [uploadData, setUploadData] = useState<string | null>(null);
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+  const [uploadConcept, setUploadConcept] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [pinText, setPinText] = useState<PinText>({
     top: PIN_TEXT_DEFAULTS.top,
     middle: PIN_TEXT_DEFAULTS.middle,
@@ -67,6 +71,7 @@ export default function DesignPage() {
     setPinText(prev => ({ ...prev, [slot]: sanitizeLine(value, PIN_TEXT_LIMITS[slot]) }));
   }
   const fileRef = useRef<HTMLInputElement>(null);
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch('/api/design/my-pins')
@@ -160,6 +165,69 @@ export default function DesignPage() {
       URL.revokeObjectURL(url);
     };
     img.src = url;
+  }
+
+  function handleUploadSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Cap at 1280px and encode as JPEG 0.92 to keep request bodies well under
+    // Vercel's 4.5MB serverless body limit while still looking sharp on a pin.
+    const img = document.createElement('img');
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const maxSize = 1280;
+      let w = img.width;
+      let h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+      }
+      const dataUri = canvas.toDataURL('image/jpeg', 0.92);
+      setUploadData(dataUri);
+      setUploadPreview(dataUri);
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  }
+
+  function clearUpload() {
+    setUploadData(null);
+    setUploadPreview(null);
+    setUploadConcept('');
+    if (uploadRef.current) uploadRef.current.value = '';
+  }
+
+  async function handleUploadSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!uploadData || !uploadConcept.trim()) return;
+    setUploading(true);
+    setError('');
+    setJustSubmitted(false);
+    const res = await fetch('/api/design/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: uploadData, concept_text: uploadConcept.trim() }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? 'Upload failed');
+      setUploading(false);
+      return;
+    }
+    setSubmittedPins(prev => [{ id: data.pin.id, image_url: data.pin.image_url, concept_text: data.pin.concept_text }, ...prev]);
+    clearUpload();
+    setJustSubmitted(true);
+    setUploading(false);
   }
 
   function handleStylePick(template: typeof STYLE_TEMPLATES[0]) {
@@ -417,6 +485,79 @@ export default function DesignPage() {
               <p className="text-gray-400 text-base leading-relaxed">
                 <span className="text-sp-white font-bold">Tip:</span> Bold shape, one wow feature (spinner, dangler, glitter, or glow). Pick one — five stacked together looks busy.
               </p>
+            </div>
+
+            {/* Upload your own original design */}
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex-1 h-px bg-gray-800"/>
+                <span className="text-gray-500 text-base uppercase tracking-widest">or</span>
+                <div className="flex-1 h-px bg-gray-800"/>
+              </div>
+
+              <div className="bg-charcoal/60 border border-gray-800 rounded-xl p-4">
+                <p className="text-sp-white text-lg font-bold mb-1">Upload Your Own Design</p>
+                <p className="text-gray-400 text-base mb-3">Drew, painted, or designed something yourself? Upload it straight to the contest. No AI step.</p>
+
+                <form onSubmit={handleUploadSubmit} className="flex flex-col gap-3">
+                  {!uploadPreview && (
+                    <button
+                      type="button"
+                      onClick={() => uploadRef.current?.click()}
+                      className="w-full bg-black/40 border-2 border-dashed border-gray-700 text-gray-400 px-4 py-8 rounded-xl hover:border-crimson/60 hover:text-sp-white active:scale-95 transition-all flex flex-col items-center gap-2"
+                    >
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                      <span className="text-base font-bold">Choose an image</span>
+                      <span className="text-base text-gray-500">PNG, JPG, or HEIC</span>
+                    </button>
+                  )}
+
+                  {uploadPreview && (
+                    <div className="flex flex-col gap-2">
+                      <div className="relative w-full max-w-sm mx-auto aspect-square rounded-2xl overflow-hidden border-2 border-crimson/40 bg-white"
+                        style={{ boxShadow: '0 0 30px rgba(255,85,0,0.15)' }}>
+                        <Image src={uploadPreview} alt="Your uploaded design" fill className="object-contain" sizes="380px" unoptimized />
+                      </div>
+                      <button type="button" onClick={clearUpload} className="text-base text-gray-400 hover:text-fire self-center">Remove</button>
+                    </div>
+                  )}
+
+                  <input
+                    ref={uploadRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleUploadSelect}
+                  />
+
+                  {uploadPreview && (
+                    <>
+                      <div>
+                        <label className="text-gray-400 text-base font-bold uppercase tracking-wider block mb-1">Description</label>
+                        <input
+                          type="text"
+                          value={uploadConcept}
+                          onChange={e => setUploadConcept(e.target.value.slice(0, 140))}
+                          placeholder="What is your design? (e.g. 'Hurricanes lightning baseball')"
+                          maxLength={140}
+                          className="w-full bg-black/40 border border-gray-700 text-sp-white text-base px-3 py-3 rounded-lg focus:outline-none focus:border-crimson placeholder-gray-500"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={!uploadConcept.trim() || uploading}
+                        className="w-full bg-green-600 text-white font-bold text-lg py-4 rounded-xl uppercase tracking-widest disabled:opacity-40 active:scale-95 transition-all"
+                        style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', boxShadow: '0 4px 20px rgba(34,197,94,0.3)' }}
+                      >
+                        {uploading ? 'Submitting...' : 'Submit My Design'}
+                      </button>
+                    </>
+                  )}
+                </form>
+              </div>
             </div>
 
             {/* Template helpers — appear AFTER the design dialogue so the
